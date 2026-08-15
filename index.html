@@ -17,7 +17,7 @@
         <div class="meteors-container" id="meteors-box"></div>
 
         <!-- ==========================================
-             🪐 ЭКРАН 1: ТОННЕЛЬ
+             🪐 ЭКРАН 1: ТОННЕЛЬ (ОРИГИНАЛЬНЫЙ)
              ========================================== -->
         <div id="screen-connect" class="screen active">
             <div class="map-3d-wrapper">
@@ -40,7 +40,7 @@
                 <div class="telemetry-bar hidden" id="telemetry-bar">
                     <span>⚡️ <b id="ping-val">24</b> ms</span>
                     <span class="divider">•</span>
-                    <span>🛡️ VLESS-REALITY</span>
+                    <span>🛡 VLESS-REALITY</span>
                 </div>
             </div>
 
@@ -60,13 +60,12 @@
         </div>
 
         <!-- ==========================================
-             👤 ЭКРАН 2: ЛИЧНЫЙ КАБИНЕТ
+             👤 ЭКРАН 2: ЛИЧНЫЙ КАБИНЕТ (ОРИГИНАЛЬНЫЙ)
              ========================================== -->
         <div id="screen-profile" class="screen">
             <div class="profile-header">
                 <h2>👤 ТВОЙ ПРОФИЛЬ SOL</h2>
-                <div class="sub-card">
-                    <div class="sub-info">
+                <div class="sub-card"><div class="sub-info">
                         <span>Срок действия подписки</span>
                         <p id="sub-days-left">Не active</p>
                     </div>
@@ -86,7 +85,7 @@
                 </div>
             </div>
 
-            <!-- 🎁 ВЫТЯГИВАЮЩАЯСЯ ПЛАШКА ВВОДА ПРОМОКОДА -->
+            <!-- ВЫТЯГИВАЮЩАЯСЯ ПЛАШКА ВВОДА ПРОМОКОДА -->
             <div class="promo-drawer-container hidden-drawer" id="promo-drawer">
                 <div class="promo-card-box" id="promo-card-element">
                     <div class="promo-header">
@@ -103,7 +102,7 @@
                 </div>
             </div>
 
-            <!-- 👥 ИНТЕРАКТИВНЫЙ БЛОК РЕФЕРАЛКИ -->
+            <!-- ИНТЕРАКТИВНЫЙ БЛОК РЕФЕРАЛКИ -->
             <div class="promo-drawer-container hidden-drawer" id="ref-drawer">
                 <div class="ref-card-box">
                     <div class="promo-header">
@@ -133,14 +132,12 @@
                 <button id="reveal-tariffs-btn" class="liquid-reveal-btn" onclick="toggleTariffs()">
                     ПОСМОТРЕТЬ ТАРИФЫ
                 </button>
-
                 <div class="tariffs-flow-container hidden-flow" id="tariffs-flow">
                     <div class="tariffs-grid">
                         <div class="tariff-card" id="tariff-1m" onclick="selectTariff(1)">
                             <div class="tariff-title">1 МЕСЯЦ</div>
                             <div class="tariff-desc">Базовый доступ</div>
-                            <div class="tariff-price" id="price-1m">150 ₽</div>
-                        </div>
+                            <div class="tariff-price" id="price-1m">150 ₽</div></div>
                         <div class="tariff-card recommended" id="tariff-3m" onclick="selectTariff(3)">
                             <span class="badge" id="badge-3m">ВЫГОДНО</span>
                             <div class="tariff-title">3 МЕСЯЦА</div>
@@ -165,10 +162,9 @@
         </div>
 
         <!-- ==========================================
-             🎮 ЭКРАН 3: КОСМИЧЕСКИЕ ИГРЫ
+             🎮 ЭКРАН 3: КОСМИЧЕСКИЕ ИГРЫ (ОБНОВЛЕННЫЙ)
              ========================================== -->
         <div id="screen-games" class="screen">
-            <!-- Блок Блокировки (Снимается при подписке) -->
             <div class="game-lock-overlay" id="game-lock-screen">
                 <div class="lock-icon">🔒</div>
                 <h3>ОХОТА ЗАБЛОКИРОВАНА</h3>
@@ -179,40 +175,45 @@
                 <h2>🎮 КОСМИЧЕСКАЯ ОХОТА</h2>
                 <div class="games-stats-bar">
                     <div class="stat-bubble">
-                        <span>🛰️ РЕФ-ПРОЦЕНТ:</span>
+                        <span>🛰 РЕФ-ПРОЦЕНТ:</span>
                         <b id="game-ref-percent">5.0% / 40%</b>
                     </div>
                 </div>
             </div>
 
-            <!-- Идеальный бесшовный круглый радар -->
+            <!-- Круглый радар без лишнего текста -->
             <div class="game-radar-box" id="game-radar">
                 <div class="radar-circle-glow">
                     <div class="radar-line-scanner"></div>
                 </div>
-                <div class="radar-helper-text" id="radar-hint">Кометы обнаружены! Нажми СТАРТ для перехвата!</div>
                 <div class="radar-inner-canvas" id="radar-stage"></div>
             </div>
 
-            <!-- 🎡 Колесо фортуны тарифов -->
-            <div class="wheel-roulette-container hidden-wheel" id="wheel-container">
-                <div class="wheel-pointer">▼</div>
-                <div class="wheel-outer-ring" id="roulette-wheel">
-                    <div class="wheel-segment seg-1m" style="transform: rotate(0deg) skewY(-60deg);"><span>1м</span></div>
-                    <div class="wheel-segment seg-3m" style="transform: rotate(90deg) skewY(-60deg);"><span>3м</span></div>
-                    <div class="wheel-segment seg-6m" style="transform: rotate(180deg) skewY(-60deg);"><span>6м</span></div>
-                    <div class="wheel-segment seg-12m" style="transform: rotate(270deg) skewY(-60deg);"><span>12м</span></div>
+            <!-- Вертикальный Слот-Барабан Скидок -->
+            <div class="space-slot-container hidden-slot" id="wheel-container">
+                <div class="slot-arrow arrow-left">►</div>
+                <div class="slot-window">
+                    <div class="slot-reel" id="roulette-wheel">
+                        <div class="slot-card card-1m">1 МЕСЯЦ</div>
+                        <div class="slot-card card-3m">3 МЕСЯЦА</div>
+                        <div class="slot-card card-6m">6 МЕСЯЦЕВ</div>
+                        <div class="slot-card card-12m">VIP ДОСТУП</div>
+                        <div class="slot-card card-1m">1 МЕСЯЦ</div>
+                        <div class="slot-card card-3m">3 МЕСЯЦА</div>
+                        <div class="slot-card card-6m">6 МЕСЯЦЕВ</div>
+                        <div class="slot-card card-12m">VIP ДОСТУП</div>
+                    </div>
                 </div>
-                <div class="wheel-center-pin">⚡️</div>
+                <div class="slot-arrow arrow-right">◄</div>
             </div>
 
-            <button id="start-radar-btn" class="liquid-reveal-btn" onclick="startCatchGame()">
+            <button id="start-radar-btn" class="liquid-reveal-btn radar-available" onclick="startCatchGame()">
                 ЗАПУСТИТЬ СКАНИРОВАНИЕ
             </button>
         </div>
 
         <!-- ==========================================
-             💡 ЭКРАН 4: ИНФОРМАЦИЯ / FAQ
+             💡 ЭКРАН 4: ИНФОРМАЦИЯ / FAQ (ОРИГИНАЛЬНЫЙ)
              ========================================== -->
         <div id="screen-info" class="screen">
             <div class="faq-header">
@@ -227,7 +228,9 @@
                     <span class="term-title">SOL_ASSISTANT v2.4</span>
                 </div>
                 <div class="terminal-body" id="terminal-text"></div>
-            </div><div class="faq-questions-scroll">
+            </div>
+            
+            <div class="faq-questions-scroll">
                 <button class="faq-btn" onclick="answerFAQ(1)">
                     <span>❓ Как подключить VPN?</span>
                 </button>
@@ -247,7 +250,7 @@
         </div>
 
         <!-- ==========================================
-             🧭 НАВИГАЦИЯ (4 КНОПКИ)
+             🧭 НАВИГАЦИЯ (ОРИГИНАЛЬНАЯ)
              ========================================== -->
         <nav class="bottom-nav">
             <div class="nav-liquid-box" id="nav-liquid-box"></div>

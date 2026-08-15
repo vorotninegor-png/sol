@@ -20,6 +20,8 @@ let currentRefPercent = 5.0;
 const maxRefPercent = 40.0;
 let isGameRunning = false;
 let isSubscribedUser = false; // Флаг подписки
+let isScanAvailable = true;   // Стейт лимита на сканирование
+let caughtCount = 0;          // Сколько комет поймано в текущем раунде
 
 // Инициализация данных пользователя Telegram
 if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
@@ -29,7 +31,6 @@ if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
         isSubscribedUser = true; // Админу подписка активна всегда!
     }
 } else {
-    // Вне телеграма (на ПК) для твоего удобства тестирования тоже делаем админ-режим:
     isAdmin = true;
     isSubscribedUser = true;
 }
@@ -38,10 +39,14 @@ if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
 const originalPrices = { 1: 150, 3: 400, 6: 650, 12: 990 };
 let activeDiscounts = { 1: 0, 3: 0, 6: 0, 12: 0 };
 
-// 🌟 1. КОСМОС
+// ==========================================
+// 🌟 1. КОСМОС (ТВОЙ ОРИГИНАЛЬНЫЙ)
+// ==========================================
 function initSpaceFX() {
     const starBox = document.getElementById("stardust-box");
     const meteorBox = document.getElementById("meteors-box");
+
+    if (!starBox || !meteorBox) return;
 
     let starHTML = "";
     for (let i = 0; i < 38; i++) {
@@ -77,15 +82,19 @@ function initSpaceFX() {
     }
 }
 
-// 🗺️ 2. ВЕКТОРНАЯ КАРТА МИРА
+// ==========================================
+// 🗺 2. ВЕКТОРНАЯ КАРТА МИРА (ТВОЯ ОРИГИНАЛЬНАЯ)
+// ==========================================
 function initMap3D() {
     const continentsGroup = document.getElementById("map-continents-group");
     const citiesGroup = document.getElementById("all-cities-group");
 
+    if (!continentsGroup || !citiesGroup) return;
+
     continentsGroup.innerHTML = `
         <path class="continent-shape" d="M 50 120 C 60 90, 100 80, 150 70 C 200 60, 270 65, 305 85 C 325 105, 305 130, 275 145 C 250 155, 230 165, 215 215 C 195 205, 180 180, 150 170 C 120 160, 75 155, 50 120 Z" />
         <path class="continent-shape" d="M 315 50 C 340 35, 380 35, 405 60 C 395 85, 365 100, 330 90 C 310 80, 305 60, 315 50 Z" />
-        <path class="continent-shape" d="M 230 225 C 265 230, 315 250, 345 280 C 360 320, 335 380, 295 430 C 275 455, 260 435, 250 385 C 235 335, 215285, 230 225 Z" />
+        <path class="continent-shape" d="M 230 225 C 265 230, 315 250, 345 280 C 360 320, 335 380, 295 430 C 275 455, 260 435, 250 385 C 235 335, 215 285, 230 225 Z" />
         <path class="continent-shape" d="M 430 145 C 450 120, 490 90, 560 80 C 640 70, 760 65, 850 85 C 910 100, 960 125, 940 160 C 910 185, 860 210, 800 225 C 740 245, 690 255, 630 230 C 570 210, 520 190, 470 180 C 430 175, 415 160, 430 145 Z" />
         <path class="continent-shape" d="M 485 80 C 500 60, 525 60, 535 85 C 520 105, 495 105, 485 80 Z" />
         <path class="continent-shape" d="M 435 110 C 450 100, 460 110, 450 127 C 435 130, 430 120, 435 110 Z" />
@@ -133,10 +142,11 @@ function initMap3D() {
     });
 
     citiesGroup.innerHTML = citiesHTML;
-    alignNavBox(0);
 }
 
-// 💧 3. КАПЛИ
+// ==========================================
+// 💧 3. КАПЛИ (ТВОЯ ОРИГИНАЛЬНАЯ ФИЗИКА)
+// ==========================================
 function triggerLiquidSplash() {
     const dropsBox = document.getElementById("liquid-drops-box");
     if (!dropsBox) return;
@@ -177,7 +187,9 @@ function triggerLiquidSplash() {
     }, 10);
 }
 
-// ⚡️ 4. ПОДКЛЮЧЕНИЕ
+// ==========================================
+// ⚡️ 4. ПОДКЛЮЧЕНИЕ ТОННЕЛЯ (ТВОЕ ОРИГИНАЛЬНОЕ)
+// ==========================================
 const connectBtn = document.getElementById("connect-btn");
 const statusBadge = document.getElementById("status-badge");
 const statusText = document.getElementById("status-text");
@@ -249,6 +261,8 @@ function connectVPN() {
     connectionsGroup.innerHTML = `<path id="laser-path" class="laser-line" d="${pathD}" />`;
 
     const laserPath = document.getElementById("laser-path");
+    if (!laserPath) return;
+
     const pathLength = laserPath.getTotalLength();
     laserPath.style.strokeDasharray = pathLength;
     laserPath.style.strokeDashoffset = pathLength;
@@ -323,7 +337,9 @@ function flashCity(cityId) {
     const node = document.getElementById(`city-${cityId}`);
     if (node && !node.classList.contains("flash-green")) {
         node.classList.add("flash-green");
-        setTimeout(() => node.classList.remove("flash-green"), 450);
+        setTimeout(() => {
+            if (node) node.classList.remove("flash-green");
+        }, 450);
     }
 }
 
@@ -332,9 +348,12 @@ function copyVlessKey() {
     const dummyKey = "vless://sol-vpn-node-amsterdam-secure-key-9981273";
     navigator.clipboard.writeText(dummyKey);
     alert("✨ Ключ VLESS скопирован в буфер обмена!");
+    if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
 }
 
-// 🎁 6. ПРОМОКОДЫ
+// ==========================================
+// 🎁 6. ПРОМОКОДЫ (ТВОИ ОРИГИНАЛЬНЫЕ АНИМАЦИИ)
+// ==========================================
 function togglePromoCard() {
     const drawer = document.getElementById("promo-drawer");
     const promoCardTrigger = document.getElementById("promo-trigger-card");
@@ -347,11 +366,11 @@ function togglePromoCard() {
         if (isRefOpen) toggleRefCard();
         drawer.classList.remove("hidden-drawer");
         promoCardTrigger.classList.add("active-card");
-        setTimeout(() => { inputField.focus(); }, 200);
+        setTimeout(() => { if (inputField) inputField.focus(); }, 200);
     } else {
         drawer.classList.add("hidden-drawer");
         promoCardTrigger.classList.remove("active-card");
-        inputField.blur();
+        if (inputField) inputField.blur();
         resetPromoStyles();
     }
     if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
@@ -364,13 +383,17 @@ function resetPromoStyles() {
     const btn = document.getElementById("promo-apply-btn");
     const headerText = document.getElementById("promo-header-text");
 
-    card.className = "promo-card-box";
-    statusMsg.className = "promo-status-msg";
-    statusMsg.innerText = "";
-    input.className = "";
-    btn.className = "apply-promo-btn";
-    headerText.style.color = "#c084fc";
-    headerText.innerText = "🎁 ВВЕДИТЕ ПРОМОКОД";
+    if (card) card.className = "promo-card-box";
+    if (statusMsg) {
+        statusMsg.className = "promo-status-msg";
+        statusMsg.innerText = "";
+    }
+    if (input) input.className = "";
+    if (btn) btn.className = "apply-promo-btn";
+    if (headerText) {
+        headerText.style.color = "#c084fc";
+        headerText.innerText = "🎁 ВВЕДИТЕ ПРОМОКОД";
+    }
 }
 
 function applyPromoCode() {
@@ -380,29 +403,37 @@ function applyPromoCode() {
     const btn = document.getElementById("promo-apply-btn");
     const headerText = document.getElementById("promo-header-text");
     
+    if (!inputField) return;
     const val = inputField.value.trim().toUpperCase();
 
     if (!val) {
-        card.classList.add("error-glow");
-        setTimeout(() => card.classList.remove("error-glow"), 350);
+        if (card) {
+            card.classList.add("error-glow");
+            setTimeout(() => card.classList.remove("error-glow"), 350);
+        }
         if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("error");
         return;
     }
 
     if (val === "SOL2025" || val === "VIP") {
-        card.className = "promo-card-box success-glow";
-        inputField.className = "success-border";
-        btn.className = "apply-promo-btn success-btn";
-        headerText.innerText = "🎉 УСПЕШНО!";
-        headerText.style.color = "#10b981";
-
-        statusMsg.innerText = "АКТИВИРОВАН +7 ДНЕЙ!";
-        statusMsg.className = "promo-status-msg show-msg success-txt";
+        if (card) card.className = "promo-card-box success-glow";
+        if (inputField) inputField.className = "success-border";
+        if (btn) btn.className = "apply-promo-btn success-btn";
+        if (headerText) {
+            headerText.innerText = "🎉 УСПЕШНО!";
+            headerText.style.color = "#10b981";
+        }
+        if (statusMsg) {
+            statusMsg.innerText = "АКТИВИРОВАН +7 ДНЕЙ!";
+            statusMsg.className = "promo-status-msg show-msg success-txt";
+        }
 
         if (!isAdmin) {
             isSubscribedUser = true;
-            document.getElementById("sub-days-left").innerText = "28дней";
-            document.getElementById("sub-progress-bar").style.width = "85%";
+            const leftVal = document.getElementById("sub-days-left");
+            const bar = document.getElementById("sub-progress-bar");
+            if (leftVal) leftVal.innerText = "28 дней";
+            if (bar) bar.style.width = "85%";
         }
 
         checkGameLockStatus();
@@ -414,15 +445,19 @@ function applyPromoCode() {
             togglePromoCard();
         }, 1800);
     } else {
-        card.className = "promo-card-box error-glow";
-        inputField.className = "error-border";
-        statusMsg.innerText = "НЕ ДЕЙСТВИТЕЛЕН";
-        statusMsg.className = "promo-status-msg show-msg error-txt";
+        if (card) card.className = "promo-card-box error-glow";
+        if (inputField) inputField.className = "error-border";
+        if (statusMsg) {
+            statusMsg.innerText = "НЕ ДЕЙСТВИТЕЛЕН";
+            statusMsg.className = "promo-status-msg show-msg error-txt";
+        }
         if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("error");
     }
 }
 
-// 👥 7. РЕФЕРАЛКА
+// ==========================================
+// 👥 7. РЕФЕРАЛКА (ТВОИ ОРИГИНАЛЬНЫЕ АНИМАЦИИ)
+// ==========================================
 function toggleRefCard() {
     const drawer = document.getElementById("ref-drawer");
     const refCardTrigger = document.getElementById("ref-trigger-card");
@@ -432,17 +467,18 @@ function toggleRefCard() {
     if (isRefOpen) {
         if (isTariffsOpen) toggleTariffs();
         if (isPromoOpen) togglePromoCard();
-        drawer.classList.remove("hidden-drawer");
-        refCardTrigger.classList.add("active-card");
+        if (drawer) drawer.classList.remove("hidden-drawer");
+        if (refCardTrigger) refCardTrigger.classList.add("active-card");
     } else {
-        drawer.classList.add("hidden-drawer");
-        refCardTrigger.classList.remove("active-card");
+        if (drawer) drawer.classList.add("hidden-drawer");
+        if (refCardTrigger) refCardTrigger.classList.remove("active-card");
     }
     if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
 }
 
 function copyRefLinkDirect() {
     const field = document.getElementById("ref-link-field");
+    if (!field) return;
     navigator.clipboard.writeText(field.value);
     alert("🚀 Реферальная ссылка скопирована в буфер обмена!");
     if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
@@ -458,56 +494,115 @@ function checkGameLockStatus() {
     }
 }
 
-// 🎮 8. ОХОТА НА КОМЕТЫ
+// ==========================================
+// 🎮 8. ОХОТА НА КОМЕТЫ (ИГРЫ - УЛЬТРА ПЛАВНЫЕ)
+// ==========================================
 function startCatchGame() {
     if (isGameRunning) return;
     
-    document.getElementById("wheel-container").classList.add("hidden-wheel");
+    const slotContainer = document.getElementById ("wheel-container");
+    if (slotContainer) slotContainer.classList.add("hidden-slot");
+
+    if (!isScanAvailable && !isAdmin) {
+        if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("error");
+        alert("🚨 Лимит сканирования исчерпан! Сканер перезаряжается. Возвращайтесь завтра!");
+        return;
+    }
 
     isGameRunning = true;
+    caughtCount = 0; 
     const stage = document.getElementById("radar-stage");
-    const hint = document.getElementById("radar-hint");
     const startBtn = document.getElementById("start-radar-btn");
 
-    stage.innerHTML = "";
-    hint.innerText = "🛰️ Сканирование... Перехватываю траектории!";
-    startBtn.style.opacity = "0.5";
-    startBtn.innerText = "ИДЕТ СКАНИРОВАНИЕ...";
+    if (stage) stage.innerHTML = "";
+    
+    // Плавно перекрашиваем кнопку в оранжевый при скане
+    if (startBtn) {
+        startBtn.className = "liquid-reveal-btn radar-active";
+        startBtn.innerText = "ИДЕТ СКАНИРОВАНИЕ...";
+    }
 
     if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("medium");
 
+    // Ищем или создаем контейнер ячеек строго под кнопкой
+    let crystalArea = document.getElementById("crystal-loot-under-btn");
+    if (!crystalArea && startBtn) {
+        crystalArea = document.createElement("div");
+        crystalArea.id = "crystal-loot-under-btn";
+        crystalArea.className = "crystal-container-row";
+        startBtn.parentNode.insertBefore(crystalArea, startBtn.nextSibling);
+    }
+    
+    if (crystalArea) {
+        crystalArea.innerHTML = "";
+        crystalArea.classList.remove("show-row");
+        
+        // Создаем ровно 5 пустых ячеек-ромбов с белым мерцанием
+        for (let i = 0; i < 5; i++) {
+            const slot = document.createElement("div");
+            slot.className = "crystal-loot-slot";
+            slot.id = `loot-slot-${i}`;
+            crystalArea.appendChild(slot);
+        }
+
+        // Триггерим плавное появление вылетающей панельки
+        setTimeout(() => {
+            if (crystalArea) crystalArea.classList.add("show-row");
+        }, 50);
+    }
+
+    // Запускаем ровно 5 летящих комет
     const cometCount = 5;
     for (let i = 0; i < cometCount; i++) {
         setTimeout(() => {
             if (isGameRunning) {
-                const randomSpeed = 2000 + Math.random() * 2000;
-                spawnComet(i + 1, randomSpeed);
+                const randomSpeed = 1600 + Math.random() * 1800;
+                spawnComet(i, randomSpeed);
             }
         }, i * 1100);
     }
 
+    // Завершение сканирования
     setTimeout(() => {
         isGameRunning = false;
-        hint.innerText = "🛰️ Сканирование завершено. Ждем новые аномалии!";
-        startBtn.style.opacity = "1";
-        startBtn.innerText = "ЗАПУСТИТЬ СКАНИРОВАНИЕ";
+        
+        // Плавно прячем плашку через 15 секунд простоя
+        setTimeout(() => {
+            if (!isGameRunning && crystalArea) {
+                crystalArea.classList.remove("show-row");
+            }
+        }, 15000);
+
+        if (startBtn) {
+            if (!isAdmin) {
+                isScanAvailable = false;
+                startBtn.className = "liquid-reveal-btn radar-locked";
+                startBtn.innerText = "ЛИМИТ ИСЧЕРПАН (ЖДЕМ 24ч)";
+            } else {
+                startBtn.className = "liquid-reveal-btn radar-available";
+                startBtn.innerText = "ЗАПУСТИТЬ СКАНИРОВАНИЕ";
+            }
+        }
     }, 7000);
 }
 
-function spawnComet(id, speed) {
+function spawnComet(index, speed) {
     const stage = document.getElementById("radar-stage");
     if (!stage) return;
 
     const comet = document.createElement("div");
     comet.className = "comet";
-    comet.id = `comet-${id}`;
+    
+    const colors = ["#3b82f6", "#10b981", "#ffffff", "#c084fc"];
+    const randColor = colors[Math.floor(Math.random() * colors.length)];
+    comet.style.boxShadow = `0 0 15px ${randColor}`;
 
     const startFromLeft = Math.random() > 0.5;
     const startX = startFromLeft ? -30 : stage.offsetWidth + 30;
-    const startY = Math.random() * (stage.offsetHeight - 50) + 25;
+    const startY = Math.random() * (stage.offsetHeight - 120) + 25; 
     
     const targetX = startFromLeft ? stage.offsetWidth + 30 : -30;
-    const targetY = Math.random() * (stage.offsetHeight - 50) + 25;
+    const targetY = Math.random() * (stage.offsetHeight - 120) + 25;
 
     comet.style.left = `${startX}px`;
     comet.style.top = `${startY}px`;
@@ -519,7 +614,36 @@ function spawnComet(id, speed) {
 
     const onHit = (e) => {
         e.stopPropagation();
-        crackComet(comet, id, e);
+        if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("medium");
+        
+        const slot = document.getElementById(`loot-slot-${caughtCount}`); 
+        if (slot) {
+            caughtCount++;
+            
+            const rect = slot.getBoundingClientRect();
+            const stageRect = stage.getBoundingClientRect();
+            const targetSlotX = rect.left - stageRect.left + rect.width / 2;
+            const targetSlotY = rect.top - stageRect.top + rect.height / 2;
+
+            anime({
+                targets: comet,
+                left: targetSlotX,
+                top: targetSlotY,
+                scale: 0.2,
+                opacity: {
+                    value: 0,
+                    duration: 500,
+                    easing: 'easeInQuad'
+                },
+                duration: 600,
+                easing: 'cubicBezier(0.25, 1, 0.5, 1)',
+                complete: () => {
+                    comet.remove();
+                    slot.innerHTML = `<div class="crystal-core" style="background: ${randColor}; box-shadow: 0 0 12px ${randColor};"></div>`;
+                    slot.addEventListener("click", () => breakCrystal(slot, randColor));
+                }
+            });
+        }
     };
 
     comet.addEventListener("mousedown", onHit);
@@ -539,47 +663,32 @@ function spawnComet(id, speed) {
     });
 }
 
-function crackComet(cometEl, id, event) {
-    if (cometEl.classList.contains("cracked")) return;
-    cometEl.classList.add("cracked");
+function breakCrystal(slot, randColor) {
+    if (slot.classList.contains("broken")) return;
+    slot.classList.add("broken");
+    slot.innerHTML = ""; 
 
-    for (let i = 0; i < 3; i++) {
-        const crack = document.createElement("div");
-        crack.className = "crack-line";
-        crack.style.transform = `rotate(${Math.random() * 360}deg)`;
-        cometEl.appendChild(crack);
-    }
-
-    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("medium");
-
-    anime({
-        targets: cometEl,
-        translateX: [-3, 3, -2, 2, 0],
-        duration: 180,
-        complete: () => {
-            triggerCometExplosion(cometEl, event);
-        }
-    });
-}
-
-function triggerCometExplosion(cometEl, event) {
+    const rect = slot.getBoundingClientRect();
     const stage = document.getElementById("radar-stage");
-    const rect = cometEl.getBoundingClientRect();
+    if (!stage) return;
     const stageRect = stage.getBoundingClientRect();
-    const hitX = rect.left - stageRect.left + (rect.width / 2);
-    const hitY = rect.top - stageRect.top + (rect.height / 2);
+    const x = rect.left - stageRect.left + rect.width / 2;
+    const y = rect.top - stageRect.top + rect.height / 2;
 
+    // Взрыв осколков
     for (let i = 0; i < 10; i++) {
         const dust = document.createElement("div");
         dust.className = "shatter-dust";
-        dust.style.left = `${hitX}px`;
-        dust.style.top = `${hitY}px`;
+        dust.style.left = `${x}px`;
+        dust.style.top = `${y}px`;
+        dust.style.background = randColor;
+        dust.style.boxShadow = `0 0 8px ${randColor}`;
         stage.appendChild(dust);
 
         anime({
             targets: dust,
-            left: hitX + (Math.random() - 0.5) * 80,
-            top: hitY + (Math.random() - 0.5) * 80,
+            left: x + (Math.random() - 0.5) * 80,
+            top: y + (Math.random() - 0.5) * 80,
             opacity: [1, 0],
             scale: [1, 0.2],
             duration: 500,
@@ -588,51 +697,54 @@ function triggerCometExplosion(cometEl, event) {
         });
     }
 
-    cometEl.remove();
-    determineLoot(hitX, hitY);
+    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("heavy");
+    determineLoot(x, y, slot, randColor);
 }
 
-function determineLoot(x, y) {
+function determineLoot(x, y, slot, randColor) {
     const roll = Math.random();
-    const hint = document.getElementById("radar-hint");
+    let prizeHTML = "";
 
     if (roll < 0.40) {
-        // 🟢 Зеленый дроп: + Рефералка (1 - 3 в десятичных)
         const addPercent = parseFloat((1.0 + Math.random() * 2.0).toFixed(1));
         currentRefPercent = Math.min(maxRefPercent, currentRefPercent + addPercent);
         updateRefUI();
         createFloatingText(x, y, `+${addPercent}%`, 'green-text');
-        hint.innerText = `💫 УСПЕХ! +${addPercent}% к рефералке!`;
+        prizeHTML = `<span style="color: #10b981; font-weight: 700;">+${addPercent}%</span>`;
 
     } else if (roll < 0.65) {
-        // 🔴 Красный дроп: - Рефералка (1 - 3 в десятичных)
         const subPercent = parseFloat((1.0 + Math.random() * 2.0).toFixed(1));
         currentRefPercent = Math.max(5.0, currentRefPercent - subPercent);
         updateRefUI();
         createFloatingText(x, y, `-${subPercent}%`, 'red-text');
-        hint.innerText = `💥 КРИТ! Процент рефералки снижен на -${subPercent}%`;
+        prizeHTML = `<span style="color: #ef4444; font-weight: 700;">-${subPercent}%</span>`;
 
     } else if (roll < 0.85) {
-        // 🟡 Желтый дроп: 0% пустышка
         createFloatingText(x, y, `0%`, 'yellow-text');
-        hint.innerText = `🕳️ Комета пуста. Никаких бонусов.`;
+        prizeHTML = `<span style="color: #eab308; font-weight: 700;">0.0%</span>`;
 
     } else {
-        // 🎡 Скидка (10% - 30% в целых) и рулетка тарифов
         const randomDiscount = Math.floor(10 + Math.random() * 21);
         createFloatingText(x, y, `🔥 -${randomDiscount}%!`, 'green-text');
-        hint.innerText = `🔥 Выбита скидка -${randomDiscount}%. Запуск колеса!`;
-        setTimeout(() => { spinTariffWheel(randomDiscount); }, 1200);
+        prizeHTML = `<span style="color: ${randColor}; font-weight: bold;">-${randomDiscount}%</span>`;
+
+        setTimeout(() => { spinSpaceSlot(randomDiscount); }, 1000);
     }
+
+    slot.innerHTML = `<div class="loot-surprise-node"
+[15.08.2026 22:26] Сэм – ChatGPT нейросеть 🧠: style="animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;">${prizeHTML}</div>`;
 }
 
 function updateRefUI() {
-    document.getElementById("ref-percent-val").innerText = `${currentRefPercent.toFixed(1)}%`;
-    document.getElementById("game-ref-percent").innerText = `${currentRefPercent.toFixed(1)}% / 40%`;
+    const label = document.getElementById("ref-percent-val");
+    const gameLabel = document.getElementById("game-ref-percent");
+    if (label) label.innerText = `${currentRefPercent.toFixed(1)}%`;
+    if (gameLabel) gameLabel.innerText = `${currentRefPercent.toFixed(1)}% / 40%`;
 }
 
 function createFloatingText(x, y, text, cssClass) {
     const stage = document.getElementById("radar-stage");
+    if (!stage) return;
     const el = document.createElement("div");
     el.className = `floating-drop-text ${cssClass}`;
     el.style.left = `${x}px`;
@@ -642,53 +754,59 @@ function createFloatingText(x, y, text, cssClass) {
     setTimeout(() => el.remove(), 1200);
 }
 
-// 🎡 ВРАЩЕНИЕ КОЛЕСА ТАРИФОВ
-function spinTariffWheel(discountValue) {
-    const wheelContainer = document.getElementById("wheel-container");
-    const wheel = document.getElementById("roulette-wheel");
-    const hint = document.getElementById("radar-hint");
+// Плавный слот-барабан с кривой безье
+function spinSpaceSlot(discountValue) {
+    const slotContainer = document.getElementById("wheel-container");
+    const reel = document.getElementById("roulette-wheel");
 
-    wheelContainer.classList.remove("hidden-wheel");
+    if (slotContainer) slotContainer.classList.remove("hidden-slot");
 
     if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("heavy");
 
     const roll = Math.random() * 100;
+    let targetIndex = 0; 
     let targetSegment = 1;
-    let targetAngle = 0;
 
-    // Шансы: 60% на 1м, 20% на 3м, 15% на 6м, 5% на 12м
-    if (roll < 60) {
+    if (roll < 50) {
+        targetIndex = 0;
         targetSegment = 1;
-        targetAngle = 360 * 5 + 45;
-    } else if (roll < 80) {
+    } else if (roll < 75) {
+        targetIndex = 1;
         targetSegment = 3;
-        targetAngle = 360 * 5 + 315;
-    } else if (roll < 95) {
+    } else if (roll < 90) {
+        targetIndex = 2;
         targetSegment = 6;
-        targetAngle = 360 * 5 + 225;
     } else {
+        targetIndex = 3;
         targetSegment = 12;
-        targetAngle = 360 * 5 + 135;
     }
 
-    anime({
-        targets: wheel,
-        rotate: targetAngle,
-        duration: 4000,
-        easing: 'easeOutQuint',
-        complete: () => {
-            activeDiscounts[targetSegment] = discountValue;
-            updateTariffPricesUI();
+    const cardHeight = 50; 
+    const totalCards = 4;  
+    
+    const spins = 4;
+    const finalTranslateY = -((spins * totalCards + targetIndex) * cardHeight);
 
-            hint.innerText = `🎉 СКИДКА ${discountValue}% успешно применилась на тариф ${targetSegment} мес.!`;
-            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+    if (reel) {
+        reel.style.transition = 'none';
+        reel.style.transform = 'translateY(0)';
 
-            setTimeout(() => {
-                wheelContainer.classList.add("hidden-wheel");
-                wheel.style.transform = "rotate(0deg)";
-            }, 3000);
-        }
-    });
+        setTimeout(() => {
+            reel.style.transition = 'transform 4.5s cubic-bezier(0.15, 0.85, 0.15, 1)'; 
+            reel.style.transform = `translateY(${finalTranslateY}px)`;
+        }, 50);
+    }
+
+    setTimeout(() => {
+        activeDiscounts[targetSegment] = discountValue;
+        updateTariffPricesUI();
+
+        if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+
+        setTimeout(() => {
+            if (slotContainer) slotContainer.classList.add("hidden-slot");
+        }, 3000);
+    }, 4800);
 }
 
 function updateTariffPricesUI() {
@@ -698,7 +816,7 @@ function updateTariffPricesUI() {
         const cardEl = document.getElementById(`tariff-${t}m`);
         const badgeEl = document.getElementById(`badge-${t}m`);
 
-        if (activeDiscounts[t] > 0) {
+        if (activeDiscounts[t] > 0 && priceEl && cardEl) {
             const finalPrice = Math.round(originalPrices[t] * (1 - activeDiscounts[t] / 100));
             priceEl.innerHTML = `<span style="text-decoration: line-through; opacity: 0.5; font-size:14px; margin-right:6px;">${originalPrices[t]} ₽</span> ${finalPrice} ₽`;
             cardEl.className = `tariff-card discounted-neon-${t}m show-card`;
@@ -710,7 +828,9 @@ function updateTariffPricesUI() {
     });
 }
 
-// 💡 9. БАЗА ЗНАНИЙ
+// ==========================================
+// 💡 9. БАЗА ЗНАНИЙ (ОРИГИНАЛЬНАЯ)
+// ==========================================
 const defaultInfoText = "Нажмите на любой вопрос ниже. Ваш ответ появится здесь. Если нужной темы нет — напишите в нашу техподдержку.";
 
 const faqAnswers = {
@@ -729,7 +849,7 @@ function animateDipText(newText) {
 
     if (currentWords.length > 0) {
         currentWords.forEach((word, idx) => {
-            setTimeout(() => { word.classList.add("dip-shrink"); }, idx * 12);
+            setTimeout(() => { if (word) word.classList.add("dip-shrink"); }, idx * 12);
         });
         setTimeout(() => { renderNewWordsWithExpand(newText); }, currentWords.length * 12 + 160);
     } else {
@@ -749,7 +869,7 @@ function renderNewWordsWithExpand(text) {
         span.className = "word-glyph dip-shrink";
         span.innerText = word;
         container.appendChild(span);
-        setTimeout(() => { span.classList.remove("dip-shrink"); }, 40 + idx * 20);
+        setTimeout(() => { if (span) span.classList.remove("dip-shrink"); }, 40 + idx * 20);
     });
 }
 
@@ -761,7 +881,9 @@ function answerFAQ(id) {
     }
 }
 
-// 📂 10. ТАРИФЫ
+// ==========================================
+// 📂 10. ТАРИФЫ (ТВОИ ОРИГИНАЛЬНЫЕ АНИМАЦИИ)
+// ==========================================
 function toggleTariffs() {
     const flowContainer = document.getElementById("tariffs-flow");
     const cards = document.querySelectorAll(".tariff-card");
@@ -774,12 +896,12 @@ function toggleTariffs() {
         if (isRefOpen) toggleRefCard();
         flowContainer.classList.remove("hidden-flow");
         cards.forEach((card, index) => {
-            setTimeout(() => { card.classList.add("show-card"); }, index * 90);
+            setTimeout(() => { if (card) card.classList.add("show-card"); }, index * 90);
         });
     } else {
         const reversedCards = Array.from(cards).reverse();
         reversedCards.forEach((card, index) => {
-            setTimeout(() => { card.classList.remove("show-card"); }, index * 70);
+            setTimeout(() => { if (card) card.classList.remove("show-card"); }, index * 70);
         });
         setTimeout(() => { flowContainer.classList.add("hidden-flow"); }, cards.length * 70 + 200);
     }
@@ -791,14 +913,19 @@ function selectTariff(months) {
 
     alert(`Вы успешно приобрели тариф на ${months} мес. (Тестовая покупка)!`);
     isSubscribedUser = true;
-    document.getElementById("sub-days-left").innerText = displayValue;
-    document.getElementById("sub-progress-bar").style.width = "100%";
+    
+    const leftVal = document.getElementById("sub-days-left");
+    const bar = document.getElementById("sub-progress-bar");
+    if (leftVal) leftVal.innerText = displayValue;
+    if (bar) bar.style.width = "100%";
     
     checkGameLockStatus();
     if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
 }
 
-// 🧭 11. НАВИГАЦИЯ
+// ==========================================
+// 🧭 11. НАВИГАЦИЯ (ОРИГИНАЛЬНАЯ)
+// ==========================================
 function switchNav(index, screenId) {
     document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
     document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
@@ -829,6 +956,9 @@ function alignNavBox(index) {
     }
 }
 
+// ==========================================
+// 🏁 12. ТОЧКА ВХОДА (ОРИГИНАЛЬНАЯ)
+// ==========================================
 window.onload = () => {
     initSpaceFX();
     initMap3D();
