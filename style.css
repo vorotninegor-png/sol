@@ -23,7 +23,7 @@ body {
     background: radial-gradient(circle at 50% 25%, #231045 0%, #08091a 65%, #020308 100%);
     position: relative;
     display: flex;
-    flex-direction: column;
+    flex-direction:column;
     overflow: hidden;
     box-shadow: 0 0 60px rgba(0,0,0,0.95);
 }
@@ -101,7 +101,7 @@ body {
     transform: translateY(0);
 }
 
-/* 🗺 КАРТА (ИЗНАЧАЛЬНАЯ) */
+/* 🗺 КАРТА */
 .map-3d-wrapper {
     perspective: 900px;
     width: 100%; height: 210px;
@@ -201,7 +201,7 @@ body {
 .telemetry-bar.hidden { opacity: 0; pointer-events: none; }
 .telemetry-bar .divider { color: rgba(255, 255, 255, 0.2); }
 
-/* 💧 КНОПКА-ПЛАНЕТА */
+/* 💧 КНОПКА ПОДКЛЮЧЕНИЯ */
 .connect-button-wrapper {
     display: flex; justify-content: center; align-items: center; flex-grow: 1;
 }
@@ -377,9 +377,7 @@ body {
     margin-bottom: 10px;
 }
 
-.promo-title-wrap {
-    display: flex; align-items: center; gap: 8px;
-}
+.promo-title-wrap { display: flex; align-items: center; gap: 8px; }
 
 .promo-header span, .ref-card-box .promo-header span {
     font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700;
@@ -394,10 +392,7 @@ body {
     transition: all 0.3s ease;
 }
 
-.promo-status-msg.show-msg {
-    opacity: 1; transform: translateX(0);
-}
-
+.promo-status-msg.show-msg { opacity: 1; transform: translateX(0); }
 .promo-status-msg.error-txt { color: #ef4444; filter: drop-shadow(0 0 6px #ef4444); }
 .promo-status-msg.success-txt { color: #10b981; filter: drop-shadow(0 0 6px #10b981); }
 
@@ -441,7 +436,7 @@ body {
     box-shadow: 0 0 12px rgba(16, 185, 129, 0.4) !important;
 }
 
-/* ТАРИФЫ */
+/* 📂 ТАРИФЫ (ВНЕШНЯЯ НЕОНОВАЯ АУРА И МЕТКА ВНИЗУ СПРАВА) */
 .tariffs-section {
     transition: transform 0.4s ease;
 }
@@ -454,42 +449,86 @@ body {
 }
 
 .tariffs-flow-container {
-    margin-top: 15px; max-height: 500px; overflow: hidden; transition: max-height 0.6s ease;
+    margin-top: 15px; max-height: 500px; overflow: visible !important; transition: max-height 0.6s ease;
 }
 .tariffs-flow-container.hidden-flow { max-height: 0 !important; margin-top: 0 !important; pointer-events: none; }
 
-.tariffs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tariffs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 10px 4px; }
 
 .tariff-card {
-    position: relative; background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 18px; padding: 15px;
-    cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; height: 130px;
-    opacity: 0; transform: translateY(-25px); transition: all 0.4s ease;
+    position: relative;
+    background: rgba(15, 20, 38, 0.6);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 15px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 130px;
+    opacity: 0;
+    transform: translateY(-25px);
+    transition: transform 0.4s ease, opacity 0.4s ease, border-color 0.6s ease, box-shadow 0.6s ease, background 0.6s ease;
 }
 .tariff-card.show-card { opacity: 1; transform: translateY(0); }
-.tariff-card.recommended { border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.03); }
-.tariff-card.vip { border-color: rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.04); }
 
-/* ЦВЕТА СКИДОК ДЛЯ ТАРИФОВ ПО ТЗ */
+/* МЕТКА ВНИЗУ СПРАВА ДЛЯ КАЖДОГО ТАРИФА */
+.tariff-term-tag {
+    position: absolute;
+    bottom: 12px;
+    right: 14px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.45);
+    pointer-events: none;
+}
+
+/* СОЧНЫЕ СВЕЧЕНИЯ ТАРИФОВ */
 .tariff-card.discounted-neon-1m {
     border-color: #3b82f6 !important;
-    background: rgba(59, 130, 246, 0.08) !important;
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3) !important;
+    background: rgba(59, 130, 246, 0.12) !important;
+    box-shadow: 0 0 22px 3px rgba(59, 130, 246, 0.65) !important;
+    animation: auraGlow1m 2.5s infinite alternate ease-in-out;
 }
+
 .tariff-card.discounted-neon-3m {
     border-color: #a855f7 !important;
-    background: rgba(168, 85, 247, 0.08) !important;
-    box-shadow: 0 0 15px rgba(168, 85, 247, 0.3) !important;
+    background: rgba(168, 85, 247, 0.12) !important;
+    box-shadow: 0 0 22px 3px rgba(168, 85, 247, 0.65) !important;
+    animation: auraGlow3m 2.5s infinite alternate ease-in-out;
 }
+
 .tariff-card.discounted-neon-6m {
     border-color: #10b981 !important;
-    background: rgba(16, 185, 129, 0.08) !important;
-    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3) !important;
+    background: rgba(16, 185, 129, 0.12) !important;
+    box-shadow: 0 0 22px 3px rgba(16, 185, 129, 0.65) !important;
+    animation: auraGlow6m 2.5s infinite alternate ease-in-out;
 }
+
 .tariff-card.discounted-neon-12m {
     border-color: #f59e0b !important;
-    background: rgba(245, 158, 11, 0.08) !important;
-    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3) !important;
+    background: rgba(245, 158, 11, 0.12) !important;box-shadow: 0 0 22px 3px rgba(245, 158, 11, 0.65) !important;
+    animation: auraGlow12m 2.5s infinite alternate ease-in-out;
+}
+
+@keyframes auraGlow1m {
+    0% { box-shadow: 0 0 12px 1px rgba(59, 130, 246, 0.4); }
+    100% { box-shadow: 0 0 28px 6px rgba(59, 130, 246, 0.85); }
+}
+@keyframes auraGlow3m {
+    0% { box-shadow: 0 0 12px 1px rgba(168, 85, 247, 0.4); }
+    100% { box-shadow: 0 0 28px 6px rgba(168, 85, 247, 0.85); }
+}
+@keyframes auraGlow6m {
+    0% { box-shadow: 0 0 12px 1px rgba(16, 185, 129, 0.4); }
+    100% { box-shadow: 0 0 28px 6px rgba(16, 185, 129, 0.85); }
+}
+@keyframes auraGlow12m {
+    0% { box-shadow: 0 0 12px 1px rgba(245, 158, 11, 0.4); }
+    100% { box-shadow: 0 0 28px 6px rgba(245, 158, 11, 0.85); }
 }
 
 .tariff-title { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; }
@@ -521,28 +560,27 @@ body {
 
 /* Космический Радар */
 .game-radar-box {
-    width: 100%; height: 240px; border-radius: 24px;
+    width: 100%; height: 220px; border-radius: 24px;
     background: radial-gradient(circle at 50% 50%, #0d0a21 0%, #04030a 100%);
     border: 1px solid rgba(168, 85, 247, 0.25);
-    position: relative; overflow: hidden; margin-bottom: 15px;
+    position: relative; overflow: hidden; margin-bottom: 12px;
     display: flex; flex-direction: column; justify-content: center; align-items: center;
 }
+
 .radar-circle-glow {
-    position: relative; width: 180px; height: 180px; border-radius: 50%;
+    position: relative; width: 170px; height: 170px; border-radius: 50%;
     border: 1px dashed rgba(168, 85, 247, 0.2);
     display: flex; justify-content: center; align-items: center;
     overflow: hidden;
 }
+
 .radar-line-scanner {
     position: absolute; width: 100%; height: 100%;
-    background: conic-gradient(from 0deg, rgba(168, 85, 247, 0.25) 0deg, transparent 90deg, transparent 360deg);
+    background: conic-gradient(from 0deg, rgba(168, 85, 247, 0.3) 0deg, transparent 90deg, transparent 360deg);
     border-radius: 50%; animation: rotateConic 4s linear infinite; pointer-events: none;
 }
 @keyframes rotateConic { 100% { transform: rotate(360deg); } }
 
-.radar-inner-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; }
-
-/* Кометы */
 .comet {
     position: absolute; width: 22px; height: 22px;
     background: radial-gradient(circle at 30% 30%, #ffffff 0%, #5c556a 100%);
@@ -560,37 +598,125 @@ body {
     width: 65px; height: 3px;
     background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.6), #ffffff);
     transform: translate(-100%, -50%); transform-origin: right center;
+    transition: opacity 0.3s ease;
 }
 
-/* Равноудаленные ячейки внизу радара */
-.crystal-container-row {
-    position: absolute;
-    bottom: 12px;
-    left: 4%;
-    width: 92%;
-    height: 48px;
+/* 🎰 БАРАБАН С БЕЛЫМИ СТРЕЛКАМИ И БЕЛЫМ НЕОНОМ */
+.space-slot-container {
     display: flex;
-    justify-content: space-between;
-    z-index: 20;
-}
-
-.crystal-loot-slot {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    display: flex;
-    justify-content: center;
     align-items: center;
-    cursor: pointer;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 320px;
+    height: 52px;
+    margin: 10px auto 0 auto;
+    background: rgba(15, 20, 38, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 18px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5), inset 0 0 12px rgba(255, 255, 255, 0.08);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.6s ease, box-shadow 0.6s ease;
+}
+
+.slot-arrow {
+    font-size: 15px;
+    color: #ffffff !important;
+    text-shadow: 0 0 8px #ffffff, 0 0 15px rgba(255, 255, 255, 0.8);
+    animation: arrowWhitePulse 1.2s infinite alternate ease-in-out;
+    user-select: none;
+    z-index: 10;
+}
+
+@keyframes arrowWhitePulse {
+    0% { opacity: 0.4; filter: drop-shadow(0 0 2px #ffffff); }
+    100% { opacity: 1; filter: drop-shadow(0 0 10px #ffffff); }
+}
+
+.slot-window {
+    width: 180px;
+    height: 40px;
     overflow: hidden;
     position: relative;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.25);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.4);
 }
 
-.crystal-loot-slot:active {
-    transform: scale(0.9);
+.slot-reel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.slot-card {
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-sizing: border-box;
+}
+
+.card-1m { color: #3b82f6; text-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }  
+.card-3m { color: #a855f7; text-shadow: 0 0 10px rgba(168, 85, 247, 0.6); } 
+.card-6m { color: #10b981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.6); } 
+.card-12m { color: #f59e0b; text-shadow: 0 0 12px rgba(245, 158, 11, 0.8); } 
+
+/* 💎 ЯЧЕЙКИ В ЦЕНТРЕ */
+.game-loot-middle-container {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.crystal-container-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.crystal-container-row.show-row { opacity: 1; transform: translateY(0); }
+
+.crystal-loot-slot {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s ease;
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.02);
+}
+
+.crystal-loot-slot:not(.broken) {
+    animation: spaceGlimmer 3s infinite ease-in-out alternate;
+}
+
+@keyframes spaceGlimmer {
+    0% { border-color: rgba(255, 255, 255, 0.08); box-shadow: 0 0 4px rgba(255, 255, 255, 0.02); }
+    50% { border-color: rgba(255, 255, 255, 0.25); box-shadow: 0 0 12px rgba(255, 255, 255, 0.08); }
+    100% { border-color: rgba(255, 255, 255, 0.05); box-shadow: 0 0 2px rgba(255, 255, 255, 0.01); }
 }
 
 .crystal-core {
@@ -607,114 +733,32 @@ body {
 }
 
 .loot-surprise-node {
-    font-size: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    width: 100%;
-    height: 100%;
+    font-size: 11px;
+    text-shadow: 0 0 8px currentColor;
+    font-weight: 700;
 }
 
-/* Кнопка сканирования по цветам */
-.liquid-reveal-btn.radar-available {
-    border-color: rgba(16, 185, 129, 0.45) !important;
-    background: rgba(16, 185, 129, 0.08) !important;
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.2) !important;
-    color: #10b981 !important;
+.liquid-reveal-btn {
+    transition: background 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
+                border-color 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
+                box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
+                color 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .liquid-reveal-btn.radar-active {
-    border-color: rgba(245, 158, 11, 0.45) !important;
-    background: rgba(245, 158, 11, 0.08) !important;
-    box-shadow: 0 0 20px rgba(245, 158, 11, 0.2) !important;
+    background: rgba(245, 158, 11, 0.15) !important;
+    border-color:rgba(245, 158, 11, 0.6) !important;
     color: #f59e0b !important;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.25) !important;
 }
 
 .liquid-reveal-btn.radar-locked {
-    border-color: rgba(239, 68, 68, 0.45) !important;
-    background: rgba(239, 68, 68, 0.08) !important;
-    box-shadow: 0 0 20px rgba(239, 68, 68,0.2) !important;
+    background: rgba(239, 68, 68, 0.12) !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
     color: #ef4444 !important;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.15) !important;
 }
 
-/* 🎰 СТИЛИ ДЛЯ ВЕРТИКАЛЬНОГО КОСМО-СЛОТА */
-.space-slot-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    width: 290px;
-    height: 90px;
-    margin: 15px auto;
-    background: rgba(15, 20, 38, 0.85);
-    backdrop-filter: blur(20px);
-    border: 2px solid rgba(168, 85, 247, 0.4);
-    border-radius: 22px;
-    box-shadow: 0 0 25px rgba(168, 85, 247, 0.25), inset 0 0 15px rgba(168, 85, 247, 0.15);
-    position: relative;
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.space-slot-container.hidden-slot {
-    display: none !important;
-}
-
-.slot-arrow {
-    font-size: 18px;
-    color: #ffffff;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
-    animation: arrowPulse 1s infinite alternate ease-in-out;
-    user-select: none;
-    z-index: 10;
-}
-
-@keyframes arrowPulse {
-    0% { opacity: 0.35; filter: drop-shadow(0 0 2px #fff); }
-    100% { opacity: 1; filter: drop-shadow(0 0 10px #fff); }
-}
-
-.slot-window {
-    width: 170px;
-    height: 50px;
-    overflow: hidden;
-    position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    background: rgba(0, 0, 0, 0.4);
-}
-
-.slot-reel {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.slot-card {
-    width: 100%;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    box-sizing: border-box;
-}
-
-.card-1m { color: #3b82f6; text-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }  /* Синий */
-.card-3m { color: #a855f7; text-shadow: 0 0 10px rgba(168, 85, 247, 0.6); } /* Фиолетовый */
-.card-6m { color: #10b981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.6); } /* Зеленый */
-.card-12m { color: #f59e0b; text-shadow: 0 0 12px rgba(245, 158, 11, 0.8); } /* Золотисто-оранжевый VIP */
-
-/* Уведомления вылета выигрыша */
 .floating-drop-text {
     position: absolute; font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700;
     pointer-events: none; z-index: 100; transform: translate(-50%, -50%);
@@ -730,7 +774,7 @@ body {
 .floating-drop-text.yellow-text { color: #f59e0b; filter: drop-shadow(0 0 6px #f59e0b); }
 .floating-drop-text.red-text { color: #ef4444; filter: drop-shadow(0 0 6px #ef4444); }
 
-.shatter-dust { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; pointer-events: none; }
+.shatter-dust { position: absolute; width: 5px; height: 5px; border-radius: 50%; pointer-events: none; z-index: 99; }
 
 /* 💡 ЭКРАН 4: ИНФО */
 .terminal-box {
@@ -822,94 +866,10 @@ body {
     position: absolute; top: 12px;
     width: 85px; height: 50px;
     background: rgba(168, 85, 247, 0.15);
-    border: 1px solid rgba(168, 85, 247, 0.4);
-    border-radius: 16px; box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+    border: 1px solid rgba(168, 85, 247, 0.4);border-radius: 16px; box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
     transition: left 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     pointer-events: none; z-index: 1;
 }
 
 .nav-icon { font-size: 17px; margin-bottom: 2px; }
 .nav-text { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; }
-/* 💎 Контейнер ячеек под кнопкой */
-.crystal-container-row {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-top: 20px;
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    width: 100%;
-}
-
-/* Эффект плавного вылета плашки с ячейками */
-.crystal-container-row.show-row {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Красивые ячейки-ромбы с мягким мерцанием */
-.crystal-loot-slot {
-    width: 48px;
-    height: 48px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.4s ease;
-    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.02);
-}
-
-/* Космическое мерцание пустых ячеек (как у кнопки копирования) */
-.crystal-loot-slot:not(.broken) {
-    animation: spaceGlimmer 3s infinite ease-in-out alternate;
-}
-
-@keyframes spaceGlimmer {
-    0% {
-        border-color: rgba(255, 255, 255, 0.08);
-        box-shadow: 0 0 4px rgba(255, 255, 255, 0.02);
-    }
-    50% {
-        border-color: rgba(255, 255, 255, 0.25);
-        box-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
-    }
-    100% {
-        border-color: rgba(255, 255, 255, 0.05);
-        box-shadow: 0 0 2px rgba(255, 255, 255, 0.01);
-    }
-}
-
-/* Содержимое ячейки при выпадении награды */
-.loot-surprise-node {
-    font-size: 11px;
-    text-shadow: 0 0 8px currentColor;
-    font-weight: 700;
-}
-
-/* 🔘 СТИЛИ КНОПКИ С КЛАССНОЙ ПЛАВНОЙ СМЕНОЙ ЦВЕТА */
-.liquid-reveal-btn {
-    transition: background 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
-                border-color 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
-                box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
-                color 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-/* Кнопка в режиме сканирования (Оранжевый неон) */
-.liquid-reveal-btn.radar-active {
-    background: rgba(245, 158, 11, 0.15) !important;
-    border-color: rgba(245, 158, 11, 0.6) !important;
-    color: #f59e0b !important;
-    box-shadow: 0 0 20px rgba(245, 158, 11, 0.25) !important;
-}
-
-/* Кнопка заблокирована по лимиту (Мягкий Красный) */
-.liquid-reveal-btn.radar-locked {
-    background: rgba(239, 68, 68, 0.12) !important;
-    border-color: rgba(239, 68, 68, 0.4) !important;
-    color: #ef4444 !important;
-    box-shadow: 0 0 15px rgba(239, 68, 68, 0.15) !important;
-}

@@ -2,45 +2,48 @@ const tg = window.Telegram.WebApp;
 tg.expand();
 
 // ==========================================
-// 👑 БЛОК АДМИНИСТРАТОРА (ТВОЙ ID ТУТ)
+// 👑 БЛОК АДМИНИСТРАТОРА
 // ==========================================
 const ADMIN_ID = 8544752152;
 
 let isAdmin = false;
 let userData = null;
 let isConnected = false;
+
+// СОСТОЯНИЯ ВКЛАДОК ДЛЯ СОХРАНЕНИЯ (STATE PERSISTENCE)
 let isTariffsOpen = false;
 let isPromoOpen = false;
 let isRefOpen = false;
+
 let activeLaserAnim = null;
 let allCitiesList = [];
 
-// Системный стейт рефералки и комет
+// Стейт рефералки и игр
 let currentRefPercent = 5.0;
 const maxRefPercent = 40.0;
 let isGameRunning = false;
-let isSubscribedUser = false; // Флаг подписки
-let isScanAvailable = true;   // Стейт лимита на сканирование
-let caughtCount = 0;          // Сколько комет поймано в текущем раунде
+let isSubscribedUser = false; 
+let isScanAvailable = true;   
+let caughtCount = 0;          
 
-// Инициализация данных пользователя Telegram
+// Telegram данные
 if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
     userData = tg.initDataUnsafe.user;
     if (userData.id === ADMIN_ID) {
         isAdmin = true;
-        isSubscribedUser = true; // Админу подписка активна всегда!
+        isSubscribedUser = true; 
     }
 } else {
     isAdmin = true;
     isSubscribedUser = true;
 }
 
-// Тарифы и оригинальные цены
+// Тарифы и базовые цены
 const originalPrices = { 1: 150, 3: 400, 6: 650, 12: 990 };
 let activeDiscounts = { 1: 0, 3: 0, 6: 0, 12: 0 };
 
 // ==========================================
-// 🌟 1. КОСМОС (ТВОЙ ОРИГИНАЛЬНЫЙ)
+// 🌟 1. КОСМОС
 // ==========================================
 function initSpaceFX() {
     const starBox = document.getElementById("stardust-box");
@@ -83,7 +86,7 @@ function initSpaceFX() {
 }
 
 // ==========================================
-// 🗺 2. ВЕКТОРНАЯ КАРТА МИРА (ТВОЯ ОРИГИНАЛЬНАЯ)
+// 🗺 2. ВЕКТОРНАЯ КАРТА (135 ТОЧЕК)
 // ==========================================
 function initMap3D() {
     const continentsGroup = document.getElementById("map-continents-group");
@@ -145,7 +148,7 @@ function initMap3D() {
 }
 
 // ==========================================
-// 💧 3. КАПЛИ (ТВОЯ ОРИГИНАЛЬНАЯ ФИЗИКА)
+// 💧 3. КАПЛИ
 // ==========================================
 function triggerLiquidSplash() {
     const dropsBox = document.getElementById("liquid-drops-box");
@@ -182,13 +185,12 @@ function triggerLiquidSplash() {
                         drop.style.opacity = "0";
                     }, 350);
                 }, 30);
-            }
-        }
+            }}
     }, 10);
 }
 
 // ==========================================
-// ⚡️ 4. ПОДКЛЮЧЕНИЕ ТОННЕЛЯ (ТВОЕ ОРИГИНАЛЬНОЕ)
+// ⚡️ 4. ПОДКЛЮЧЕНИЕ ТОННЕЛЯ (СТРОГО 1 ЛУЧ!)
 // ==========================================
 const connectBtn = document.getElementById("connect-btn");
 const statusBadge = document.getElementById("status-badge");
@@ -207,39 +209,15 @@ if (connectBtn) {
     });
 }
 
-function generateLongSmartPath() {
-    let selectedNodes = [];
-    let attempts = 0;
-
-    while (selectedNodes.length < 5 && attempts < 200) {
-        attempts++;
-        const candidate = allCitiesList[Math.floor(Math.random() * allCitiesList.length)];
-
-        if (selectedNodes.length === 0) {
-            selectedNodes.push(candidate);
-        } else {
-            const lastNode = selectedNodes[selectedNodes.length - 1];
-            const dist = Math.hypot(candidate.x - lastNode.x, candidate.y - lastNode.y);
-
-            if (dist >= 120 && !selectedNodes.includes(candidate)) {
-                selectedNodes.push(candidate);
-            }
-        }
-    }
-
-    if (selectedNodes.length < 5) {
-        const shuffled = [...allCitiesList].sort(() => 0.5 - Math.random());
-        selectedNodes = shuffled.slice(0, 5);
-    }
-
-    return selectedNodes;
-}
-
 function connectVPN() {
     isConnected = false;
     statusText.innerText = "ПОДКЛЮЧЕНИЕ...";
     statusBadge.className = "status-badge connecting";
     if (telemetryBar) telemetryBar.classList.add("hidden");
+
+    // МГНОВЕННО УДАЛЯЕМ ЛЮБЫЕ СТАРЫЕ ЛУЧИ!
+    const connectionsGroup = document.getElementById("connections-group");
+    if (connectionsGroup) connectionsGroup.innerHTML = "";
 
     document.querySelectorAll(".city-point").forEach(el => {
         el.className = "city-point";
@@ -257,7 +235,6 @@ function connectVPN() {
         pathD += ` Q ${midX} ${midY}, ${curr.x} ${curr.y}`;
     }
 
-    const connectionsGroup = document.getElementById("connections-group");
     connectionsGroup.innerHTML = `<path id="laser-path" class="laser-line" d="${pathD}" />`;
 
     const laserPath = document.getElementById("laser-path");
@@ -325,8 +302,7 @@ function disconnectVPN() {
             strokeDashoffset: [0, pathLength],
             easing: 'easeOutQuad',
             duration: 700,
-            complete: function() {
-                document.getElementById("connections-group").innerHTML = "";
+            complete: function() {document.getElementById("connections-group").innerHTML = "";
             }
         });
     }
@@ -352,24 +328,27 @@ function copyVlessKey() {
 }
 
 // ==========================================
-// 🎁 6. ПРОМОКОДЫ (ТВОИ ОРИГИНАЛЬНЫЕ АНИМАЦИИ)
+// 🎁 6. ПРОМОКОДЫ И РЕФЕРАЛКА С СОХРАНЕНИЕМ СОСТОЯНИЯ
 // ==========================================
-function togglePromoCard() {
+function togglePromoCard(forceState = null) {
     const drawer = document.getElementById("promo-drawer");
     const promoCardTrigger = document.getElementById("promo-trigger-card");
     const inputField = document.getElementById("promo-input-field");
 
-    isPromoOpen = !isPromoOpen;
+    if (forceState !== null) {
+        isPromoOpen = forceState;
+    } else {
+        isPromoOpen = !isPromoOpen;
+    }
 
     if (isPromoOpen) {
-        if (isTariffsOpen) toggleTariffs();
-        if (isRefOpen) toggleRefCard();
-        drawer.classList.remove("hidden-drawer");
-        promoCardTrigger.classList.add("active-card");
+        if (isRefOpen) toggleRefCard(false);
+        if (drawer) drawer.classList.remove("hidden-drawer");
+        if (promoCardTrigger) promoCardTrigger.classList.add("active-card");
         setTimeout(() => { if (inputField) inputField.focus(); }, 200);
     } else {
-        drawer.classList.add("hidden-drawer");
-        promoCardTrigger.classList.remove("active-card");
+        if (drawer) drawer.classList.add("hidden-drawer");
+        if (promoCardTrigger) promoCardTrigger.classList.remove("active-card");
         if (inputField) inputField.blur();
         resetPromoStyles();
     }
@@ -437,12 +416,11 @@ function applyPromoCode() {
         }
 
         checkGameLockStatus();
-
         if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
 
         setTimeout(() => {
             inputField.value = "";
-            togglePromoCard();
+            togglePromoCard(false);
         }, 1800);
     } else {
         if (card) card.className = "promo-card-box error-glow";
@@ -455,18 +433,18 @@ function applyPromoCode() {
     }
 }
 
-// ==========================================
-// 👥 7. РЕФЕРАЛКА (ТВОИ ОРИГИНАЛЬНЫЕ АНИМАЦИИ)
-// ==========================================
-function toggleRefCard() {
+function toggleRefCard(forceState = null) {
     const drawer = document.getElementById("ref-drawer");
     const refCardTrigger = document.getElementById("ref-trigger-card");
 
-    isRefOpen = !isRefOpen;
+    if (forceState !== null) {
+        isRefOpen = forceState;
+    } else {
+        isRefOpen = !isRefOpen;
+    }
 
     if (isRefOpen) {
-        if (isTariffsOpen) toggleTariffs();
-        if (isPromoOpen) togglePromoCard();
+        if (isPromoOpen) togglePromoCard(false);
         if (drawer) drawer.classList.remove("hidden-drawer");
         if (refCardTrigger) refCardTrigger.classList.add("active-card");
     } else {
@@ -484,7 +462,6 @@ function copyRefLinkDirect() {
     if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
 }
 
-// 🔐 ПРОВЕРКА БЛОКИРОВКИ ИГР
 function checkGameLockStatus() {
     const lockScreen = document.getElementById("game-lock-screen");
     if (isSubscribedUser) {
@@ -495,13 +472,10 @@ function checkGameLockStatus() {
 }
 
 // ==========================================
-// 🎮 8. ОХОТА НА КОМЕТЫ (ИГРЫ - УЛЬТРА ПЛАВНЫЕ)
+// 🎮 7. ИГРЫ (ОХОТА НА КОМЕТЫ)
 // ==========================================
 function startCatchGame() {
     if (isGameRunning) return;
-    
-    const slotContainer = document.getElementById ("wheel-container");
-    if (slotContainer) slotContainer.classList.add("hidden-slot");
 
     if (!isScanAvailable && !isAdmin) {
         if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("error");
@@ -511,12 +485,12 @@ function startCatchGame() {
 
     isGameRunning = true;
     caughtCount = 0; 
+
     const stage = document.getElementById("radar-stage");
     const startBtn = document.getElementById("start-radar-btn");
 
-    if (stage) stage.innerHTML = "";
+    if (stage) stage.innerHTML = `<div class="radar-circle-glow"><div class="radar-line-scanner"></div></div>`;
     
-    // Плавно перекрашиваем кнопку в оранжевый при скане
     if (startBtn) {
         startBtn.className = "liquid-reveal-btn radar-active";
         startBtn.innerText = "ИДЕТ СКАНИРОВАНИЕ...";
@@ -524,20 +498,15 @@ function startCatchGame() {
 
     if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("medium");
 
-    // Ищем или создаем контейнер ячеек строго под кнопкой
-    let crystalArea = document.getElementById("crystal-loot-under-btn");
-    if (!crystalArea && startBtn) {
-        crystalArea = document.createElement("div");
+    const middleContainer = document.getElementById("game-loot-middle-row");
+    if (middleContainer) {
+        middleContainer.innerHTML = "";
+        
+        const crystalArea = document.createElement("div");
         crystalArea.id = "crystal-loot-under-btn";
         crystalArea.className = "crystal-container-row";
-        startBtn.parentNode.insertBefore(crystalArea, startBtn.nextSibling);
-    }
-    
-    if (crystalArea) {
-        crystalArea.innerHTML = "";
-        crystalArea.classList.remove("show-row");
+        middleContainer.appendChild(crystalArea);
         
-        // Создаем ровно 5 пустых ячеек-ромбов с белым мерцанием
         for (let i = 0; i < 5; i++) {
             const slot = document.createElement("div");
             slot.className = "crystal-loot-slot";
@@ -545,34 +514,24 @@ function startCatchGame() {
             crystalArea.appendChild(slot);
         }
 
-        // Триггерим плавное появление вылетающей панельки
         setTimeout(() => {
-            if (crystalArea) crystalArea.classList.add("show-row");
+            crystalArea.classList.add("show-row");
         }, 50);
     }
 
-    // Запускаем ровно 5 летящих комет
     const cometCount = 5;
     for (let i = 0; i < cometCount; i++) {
         setTimeout(() => {
             if (isGameRunning) {
-                const randomSpeed = 1600 + Math.random() * 1800;
+                const randomSpeed = 1700 + Math.random() * 1800;
                 spawnComet(i, randomSpeed);
             }
         }, i * 1100);
     }
 
-    // Завершение сканирования
     setTimeout(() => {
         isGameRunning = false;
         
-        // Плавно прячем плашку через 15 секунд простоя
-        setTimeout(() => {
-            if (!isGameRunning && crystalArea) {
-                crystalArea.classList.remove("show-row");
-            }
-        }, 15000);
-
         if (startBtn) {
             if (!isAdmin) {
                 isScanAvailable = false;
@@ -599,10 +558,10 @@ function spawnComet(index, speed) {
 
     const startFromLeft = Math.random() > 0.5;
     const startX = startFromLeft ? -30 : stage.offsetWidth + 30;
-    const startY = Math.random() * (stage.offsetHeight - 120) + 25; 
+    const startY = Math.random() * (stage.offsetHeight - 50) + 25; 
     
     const targetX = startFromLeft ? stage.offsetWidth + 30 : -30;
-    const targetY = Math.random() * (stage.offsetHeight - 120) + 25;
+    const targetY = Math.random() * (stage.offsetHeight - 50) + 25;
 
     comet.style.left = `${startX}px`;
     comet.style.top = `${startY}px`;
@@ -612,44 +571,7 @@ function spawnComet(index, speed) {
 
     stage.appendChild(comet);
 
-    const onHit = (e) => {
-        e.stopPropagation();
-        if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("medium");
-        
-        const slot = document.getElementById(`loot-slot-${caughtCount}`); 
-        if (slot) {
-            caughtCount++;
-            
-            const rect = slot.getBoundingClientRect();
-            const stageRect = stage.getBoundingClientRect();
-            const targetSlotX = rect.left - stageRect.left + rect.width / 2;
-            const targetSlotY = rect.top - stageRect.top + rect.height / 2;
-
-            anime({
-                targets: comet,
-                left: targetSlotX,
-                top: targetSlotY,
-                scale: 0.2,
-                opacity: {
-                    value: 0,
-                    duration: 500,
-                    easing: 'easeInQuad'
-                },
-                duration: 600,
-                easing: 'cubicBezier(0.25, 1, 0.5, 1)',
-                complete: () => {
-                    comet.remove();
-                    slot.innerHTML = `<div class="crystal-core" style="background: ${randColor}; box-shadow: 0 0 12px ${randColor};"></div>`;
-                    slot.addEventListener("click", () => breakCrystal(slot, randColor));
-                }
-            });
-        }
-    };
-
-    comet.addEventListener("mousedown", onHit);
-    comet.addEventListener("touchstart", onHit);
-
-    anime({
+    const animMove = anime({
         targets: comet,
         left: targetX,
         top: targetY,
@@ -661,6 +583,75 @@ function spawnComet(index, speed) {
             }
         }
     });
+
+    const onHit = (e) => {
+        e.stopPropagation();
+        animMove.pause();
+
+        if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("heavy");
+        
+        const slot = document.getElementById(`loot-slot-${caughtCount}`);
+        if (slot) {
+            caughtCount++;
+            
+            const cometRect = comet.getBoundingClientRect();
+            const stageRect = stage.getBoundingClientRect();
+            const hitX = cometRect.left - stageRect.left + cometRect.width / 2;
+            const hitY = cometRect.top - stageRect.top + cometRect.height / 2;
+            
+            triggerBigCometExplosion(hitX, hitY, randColor);
+            comet.remove();
+
+            slot.innerHTML = `<div class="crystal-core" style="background: ${randColor}; box-shadow: 0 0 12px ${randColor}; opacity: 0; transform: scale(0.2) rotate(45deg);"></div>`;
+            
+            const core = slot.querySelector(".crystal-core");
+            if (core) {
+                anime({
+                    targets: core,
+                    opacity: 1,
+                    scale: 1,
+                    duration: 400,
+                    easing: 'easeOutBack'
+                });
+            }
+
+            slot.addEventListener("click", () => breakCrystal(slot, randColor));
+        }
+    };
+
+    comet.addEventListener("mousedown", onHit);
+    comet.addEventListener("touchstart", onHit);
+}
+
+function triggerBigCometExplosion(x, y, color) {
+    const stage = document.getElementById("radar-stage");
+    if (!stage) return;
+
+    const particleCount = 20;
+    for (let i = 0; i < particleCount; i++) {
+        const p = document.createElement("div");
+        p.className = "shatter-dust";
+        p.style.left = `${x}px`;
+        p.style.top = `${y}px`;
+        p.style.background = color;
+        p.style.boxShadow = `0 0 12px ${color}`;
+        
+        stage.appendChild(p);
+
+        const angle = (i / particleCount) * (Math.PI * 2) + Math.random() * 0.5;
+        const distance = 40 + Math.random() * 60; 
+
+        anime({
+            targets: p,
+            left: x + Math.cos(angle) * distance,
+            top: y + Math.sin(angle) * distance,
+            opacity: [1, 0],
+            scale: [1.5, 0],
+            duration: 550,
+            easing: 'easeOutQuart',
+            complete: () => p.remove()
+        });
+    }
 }
 
 function breakCrystal(slot, randColor) {
@@ -675,27 +666,7 @@ function breakCrystal(slot, randColor) {
     const x = rect.left - stageRect.left + rect.width / 2;
     const y = rect.top - stageRect.top + rect.height / 2;
 
-    // Взрыв осколков
-    for (let i = 0; i < 10; i++) {
-        const dust = document.createElement("div");
-        dust.className = "shatter-dust";
-        dust.style.left = `${x}px`;
-        dust.style.top = `${y}px`;
-        dust.style.background = randColor;
-        dust.style.boxShadow = `0 0 8px ${randColor}`;
-        stage.appendChild(dust);
-
-        anime({
-            targets: dust,
-            left: x + (Math.random() - 0.5) * 80,
-            top: y + (Math.random() - 0.5) * 80,
-            opacity: [1, 0],
-            scale: [1, 0.2],
-            duration: 500,
-            easing: 'easeOutQuad',
-            complete: () => dust.remove()
-        });
-    }
+    triggerBigCometExplosion(x, y, randColor);
 
     if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("heavy");
     determineLoot(x, y, slot, randColor);
@@ -728,11 +699,61 @@ function determineLoot(x, y, slot, randColor) {
         createFloatingText(x, y, `🔥 -${randomDiscount}%!`, 'green-text');
         prizeHTML = `<span style="color: ${randColor}; font-weight: bold;">-${randomDiscount}%</span>`;
 
-        setTimeout(() => { spinSpaceSlot(randomDiscount); }, 1000);
+        setTimeout(() => { spinSpaceSlot(randomDiscount); }, 200);
     }
 
-    slot.innerHTML = `<div class="loot-surprise-node"
-[15.08.2026 22:26] Сэм – ChatGPT нейросеть 🧠: style="animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;">${prizeHTML}</div>`;
+    slot.innerHTML = `<div class="loot-surprise-node" style="animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;">${prizeHTML}</div>`;
+}
+
+// 🎰 БАРАБАН (ВЫСОТА ШАГА = 40px)
+function spinSpaceSlot(discountValue) {
+    const slotContainer = document.getElementById("wheel-container");
+    const reel = document.getElementById("roulette-wheel");
+
+    if (!reel || !slotContainer) return;
+
+    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("heavy");
+
+    const roll = Math.random() * 100;
+    let targetIndex = 0; 
+    let targetSegment = 1;
+
+    if (roll < 50) { targetIndex = 0; targetSegment = 1; }
+    else if (roll < 75) { targetIndex = 1; targetSegment = 3; }
+    else if (roll < 90) { targetIndex = 2; targetSegment = 6; }
+    else { targetIndex = 3; targetSegment = 12; }
+
+    const cardHeight = 40;
+    const cycleOffset = 3; 
+    const targetGlobalIndex = cycleOffset * 4 + targetIndex;
+    const finalTranslateY = -(targetGlobalIndex * cardHeight);
+
+    reel.style.transition = 'none';
+    reel.style.transform = 'translateY(0)';
+
+    setTimeout(() => {
+        reel.style.transition = 'transform 4.2s cubic-bezier(0.15, 0.85, 0.15, 1)'; 
+        reel.style.transform = `translateY(${finalTranslateY}px)`;
+    }, 50);
+
+    setTimeout(() => {
+        const neons = { 1: '#3b82f6', 3: '#a855f7', 6: '#10b981', 12: '#f59e0b' };
+        
+        slotContainer.style.borderColor = neons[targetSegment];
+        slotContainer.style.boxShadow = `0 0 35px ${neons[targetSegment]}, inset 0 0 15px ${neons[targetSegment]}`;
+
+        activeDiscounts[targetSegment] = discountValue;
+        
+        // ОБНОВЛЯЕМ ЦЕНЫ, НО НЕ ОТКРЫВАЕМ ТАРИФЫ САМИ ПО СЕБЕ!
+        updateTariffPricesUI();
+
+        if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+
+        setTimeout(() => {
+            slotContainer.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+            slotContainer.style.boxShadow = '0 8px 25px rgba(0,0,0,0.5), inset 0 0 12px rgba(255, 255, 255, 0.08)';
+        }, 3000);
+    }, 4500);
 }
 
 function updateRefUI() {
@@ -754,61 +775,30 @@ function createFloatingText(x, y, text, cssClass) {
     setTimeout(() => el.remove(), 1200);
 }
 
-// Плавный слот-барабан с кривой безье
-function spinSpaceSlot(discountValue) {
-    const slotContainer = document.getElementById("wheel-container");
+function fillReelCards() {
     const reel = document.getElementById("roulette-wheel");
+    if (!reel) return;
 
-    if (slotContainer) slotContainer.classList.remove("hidden-slot");
+    const segments = [
+        { class: 'card-1m', text: '1 МЕСЯЦ' },
+        { class: 'card-3m', text: '3 МЕСЯЦА' },
+        { class: 'card-6m', text: '6 МЕСЯЦЕВ' },
+        { class: 'card-12m', text: 'VIP ДОСТУП' }
+    ];
 
-    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("heavy");
-
-    const roll = Math.random() * 100;
-    let targetIndex = 0; 
-    let targetSegment = 1;
-
-    if (roll < 50) {
-        targetIndex = 0;
-        targetSegment = 1;
-    } else if (roll < 75) {
-        targetIndex = 1;
-        targetSegment = 3;
-    } else if (roll < 90) {
-        targetIndex = 2;
-        targetSegment = 6;
-    } else {
-        targetIndex = 3;
-        targetSegment = 12;
+    let itemsHTML = "";
+    for (let i = 0; i < 5; i++) {
+        segments.forEach(seg => {
+            itemsHTML += `<div class="slot-card ${seg.class}">${seg.text}</div>`;
+        });
     }
+    reel.innerHTML = itemsHTML;
 
-    const cardHeight = 50; 
-    const totalCards = 4;  
-    
-    const spins = 4;
-    const finalTranslateY = -((spins * totalCards + targetIndex) * cardHeight);
-
-    if (reel) {
-        reel.style.transition = 'none';
-        reel.style.transform = 'translateY(0)';
-
-        setTimeout(() => {
-            reel.style.transition = 'transform 4.5s cubic-bezier(0.15, 0.85, 0.15, 1)'; 
-            reel.style.transform = `translateY(${finalTranslateY}px)`;
-        }, 50);
-    }
-
-    setTimeout(() => {
-        activeDiscounts[targetSegment] = discountValue;
-        updateTariffPricesUI();
-
-        if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
-
-        setTimeout(() => {
-            if (slotContainer) slotContainer.classList.add("hidden-slot");
-        }, 3000);
-    }, 4800);
+    const randomIndex = Math.floor(Math.random() * 4);
+    reel.style.transform = `translateY(-${randomIndex * 40}px)`;
 }
 
+// ОБНОВЛЕНИЕ ЦЕН И АУРЫ ТАРИФОВ (НЕ МЕНЯЕТ ИХ ВИДИМОСТЬ СВОЕВОЛЬНО!)
 function updateTariffPricesUI() {
     const types = [1, 3, 6, 12];
     types.forEach(t => {
@@ -819,7 +809,10 @@ function updateTariffPricesUI() {
         if (activeDiscounts[t] > 0 && priceEl && cardEl) {
             const finalPrice = Math.round(originalPrices[t] * (1 - activeDiscounts[t] / 100));
             priceEl.innerHTML = `<span style="text-decoration: line-through; opacity: 0.5; font-size:14px; margin-right:6px;">${originalPrices[t]} ₽</span> ${finalPrice} ₽`;
-            cardEl.className = `tariff-card discounted-neon-${t}m show-card`;
+            
+            const isCurrentlyShown = cardEl.classList.contains("show-card");
+            cardEl.className = `tariff-card discounted-neon-${t}m ${isCurrentlyShown ? 'show-card' : ''}`;
+            
             if (badgeEl) {
                 badgeEl.innerText = `-${activeDiscounts[t]}% СКИДКА`;
                 badgeEl.style.background = "#ef4444";
@@ -829,7 +822,7 @@ function updateTariffPricesUI() {
 }
 
 // ==========================================
-// 💡 9. БАЗА ЗНАНИЙ (ОРИГИНАЛЬНАЯ)
+// 💡 8. БАЗА ЗНАНИЙ
 // ==========================================
 const defaultInfoText = "Нажмите на любой вопрос ниже. Ваш ответ появится здесь. Если нужной темы нет — напишите в нашу техподдержку.";
 
@@ -862,7 +855,7 @@ function renderNewWordsWithExpand(text) {
     if (!container) return;
 
     container.innerHTML = "";
-    const words = text.split(" ");
+    const words =text.split(" ");
 
     words.forEach((word, idx) => {
         const span = document.createElement("span");
@@ -882,7 +875,7 @@ function answerFAQ(id) {
 }
 
 // ==========================================
-// 📂 10. ТАРИФЫ (ТВОИ ОРИГИНАЛЬНЫЕ АНИМАЦИИ)
+// 📂 9. ТАРИФЫ (УПРАВЛЕНИЕ РАСКРЫТИЕМ)
 // ==========================================
 function toggleTariffs() {
     const flowContainer = document.getElementById("tariffs-flow");
@@ -892,8 +885,8 @@ function toggleTariffs() {
     isTariffsOpen = !isTariffsOpen;
 
     if (isTariffsOpen) {
-        if (isPromoOpen) togglePromoCard();
-        if (isRefOpen) toggleRefCard();
+        if (isPromoOpen) togglePromoCard(false);
+        if (isRefOpen) toggleRefCard(false);
         flowContainer.classList.remove("hidden-flow");
         cards.forEach((card, index) => {
             setTimeout(() => { if (card) card.classList.add("show-card"); }, index * 90);
@@ -924,7 +917,7 @@ function selectTariff(months) {
 }
 
 // ==========================================
-// 🧭 11. НАВИГАЦИЯ (ОРИГИНАЛЬНАЯ)
+// 🧭 10. НАВИГАЦИЯ С СОХРАНЕНИЕМ СОСТОЯНИЙ
 // ==========================================
 function switchNav(index, screenId) {
     document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
@@ -937,6 +930,12 @@ function switchNav(index, screenId) {
     if (activeNavBtn) activeNavBtn.classList.add("active");
 
     alignNavBox(index);
+
+    // Восстановление состояний при возврате в Кабинет
+    if (screenId === 'profile') {
+        if (isPromoOpen) togglePromoCard(true);
+        if (isRefOpen) toggleRefCard(true);
+    }
 
     if (screenId === 'games') {
         checkGameLockStatus();
@@ -956,17 +955,45 @@ function alignNavBox(index) {
     }
 }
 
+function generateLongSmartPath() {
+    let selectedNodes = [];
+    let attempts = 0;
+
+    while (selectedNodes.length < 5 && attempts < 200) {
+        attempts++;
+        const candidate = allCitiesList[Math.floor(Math.random() * allCitiesList.length)];
+
+        if (selectedNodes.length === 0) {
+            selectedNodes.push(candidate);
+        } else {
+            const lastNode = selectedNodes[selectedNodes.length - 1];
+            const dist = Math.hypot(candidate.x -lastNode.x, candidate.y - lastNode.y);
+
+            if (dist >= 120 && !selectedNodes.includes(candidate)) {
+                selectedNodes.push(candidate);
+            }
+        }
+    }
+
+    if (selectedNodes.length < 5) {
+        const shuffled = [...allCitiesList].sort(() => 0.5 - Math.random());
+        selectedNodes = shuffled.slice(0, 5);
+    }
+
+    return selectedNodes;
+}
+
 // ==========================================
-// 🏁 12. ТОЧКА ВХОДА (ОРИГИНАЛЬНАЯ)
+// 🏁 11. ТОЧКА ВХОДА
 // ==========================================
 window.onload = () => {
     initSpaceFX();
     initMap3D();
+    fillReelCards();
 
     if (isAdmin) {
         isSubscribedUser = true;
         
-        // Визуальное оформление для Создателя
         const subDays = document.getElementById("sub-days-left");
         const progressBar = document.getElementById("sub-progress-bar");
         

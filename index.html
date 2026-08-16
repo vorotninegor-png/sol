@@ -4,278 +4,265 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SOL VPN App</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="app-container">
-        
-        <!-- 🌠 КОСМОС -->
-        <div class="stardust-container" id="stardust-box"></div>
-        <div class="meteors-container" id="meteors-box"></div>
+<div class="app-container">
+    <div class="stardust-container" id="stardust-box"></div>
+    <div class="meteors-container" id="meteors-box"></div>
 
-        <!-- ==========================================
-             🪐 ЭКРАН 1: ТОННЕЛЬ (ОРИГИНАЛЬНЫЙ)
-             ========================================== -->
-        <div id="screen-connect" class="screen active">
-            <div class="map-3d-wrapper">
-                <div class="map-container-3d" id="map-box">
-                    <svg id="world-map" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="1000" height="500" fill="none"/>
-                        <g id="map-continents-group"></g>
-                        <g id="all-cities-group"></g>
-                        <g id="connections-group"></g>
-                    </svg>
-                </div>
-            </div>
-
-            <div class="status-capsule">
-                <span class="status-label">СТАТУС СВЯЗИ</span>
-                <div class="status-badge disconnected" id="status-badge">
-                    <span class="status-dot"></span>
-                    <span id="status-text">ОТКЛЮЧЕНО</span>
-                </div>
-                <div class="telemetry-bar hidden" id="telemetry-bar">
-                    <span>⚡️ <b id="ping-val">24</b> ms</span>
-                    <span class="divider">•</span>
-                    <span>🛡 VLESS-REALITY</span>
-                </div>
-            </div>
-
-            <div class="connect-button-wrapper">
-                <div class="liquid-button-container" id="water-container">
-                    <div class="micro-waves-box" id="micro-waves-box"></div>
-                    <button id="connect-btn" class="power-button liquid-water-drop"></button>
-                    <div id="liquid-drops-box"></div>
-                </div>
-            </div>
-
-            <div class="key-btn-container">
-                <button id="copy-key-btn" class="action-btn key-glow-btn hidden-slide" onclick="copyVlessKey()">
-                    <span>✨ Скопировать ключ VLESS</span>
-                </button>
+    <!-- ЭКРАН 1: ТОННЕЛЬ -->
+    <div class="screen active" id="screen-tunnel">
+        <div class="map-3d-wrapper">
+            <div class="map-container-3d">
+                <svg id="world-map" viewBox="0 0 1000 500">
+                    <g id="map-continents-group"></g>
+                    <g id="connections-group"></g>
+                    <g id="all-cities-group"></g>
+                </svg>
             </div>
         </div>
 
-        <!-- ==========================================
-             👤 ЭКРАН 2: ЛИЧНЫЙ КАБИНЕТ (ОРИГИНАЛЬНЫЙ)
-             ========================================== -->
-        <div id="screen-profile" class="screen">
-            <div class="profile-header">
-                <h2>👤 ТВОЙ ПРОФИЛЬ SOL</h2>
-                <div class="sub-card"><div class="sub-info">
-                        <span>Срок действия подписки</span>
-                        <p id="sub-days-left">Не active</p>
-                    </div>
-                    <div class="progress-container">
-                        <div id="sub-progress-bar" class="progress-bar"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="quick-actions-grid">
-                <div class="action-card" id="promo-trigger-card" onclick="togglePromoCard()"><span class="act-icon">🎁</span>
-                    <span class="act-title">Промокод</span>
-                </div>
-                <div class="action-card" id="ref-trigger-card" onclick="toggleRefCard()">
-                    <span class="act-icon">👥</span>
-                    <span class="act-title">Рефералка</span>
-                </div>
-            </div>
-
-            <!-- ВЫТЯГИВАЮЩАЯСЯ ПЛАШКА ВВОДА ПРОМОКОДА -->
-            <div class="promo-drawer-container hidden-drawer" id="promo-drawer">
-                <div class="promo-card-box" id="promo-card-element">
-                    <div class="promo-header">
-                        <div class="promo-title-wrap">
-                            <span id="promo-header-text">🎁 ВВЕДИТЕ ПРОМОКОД</span>
-                            <span class="promo-status-msg" id="promo-status-msg"></span>
-                        </div>
-                        <button class="close-promo-btn" onclick="togglePromoCard()">✕</button>
-                    </div>
-                    <div class="promo-input-row">
-                        <input type="text" id="promo-input-field" placeholder="Например: SOL2025" autocomplete="off" spellcheck="false" oninput="resetPromoStyles()">
-                        <button class="apply-promo-btn" id="promo-apply-btn" onclick="applyPromoCode()">ОК</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ИНТЕРАКТИВНЫЙ БЛОК РЕФЕРАЛКИ -->
-            <div class="promo-drawer-container hidden-drawer" id="ref-drawer">
-                <div class="ref-card-box">
-                    <div class="promo-header">
-                        <span>👥 РЕФЕРАЛЬНАЯ ПРОГРАММА</span>
-                        <button class="close-promo-btn" onclick="toggleRefCard()">✕</button>
-                    </div>
-                    <div class="ref-stats-row">
-                        <div class="ref-stat-item">
-                            <span class="ref-label">ВАШ БОНУС</span>
-                            <span class="ref-val" id="ref-percent-val">5.0%</span>
-                        </div>
-                        <div class="ref-stat-item info-align-right">
-                            <span class="ref-label">МАКСИМУМ</span>
-                            <span class="ref-val max-color">40.0%</span>
-                        </div>
-                    </div>
-                    <p class="ref-hint-text">Увеличь процент рефералки до 40.0%, собирая кометы в разделе <b>Игры</b>! 🎮</p>
-                    <div class="promo-input-row">
-                        <input type="text" id="ref-link-field" readonly value="https://t.me/sol_vpn_bot?start=ref_12345">
-                        <button class="apply-promo-btn success-btn" onclick="copyRefLinkDirect()">КОПИРОВАТЬ</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Блок Тарифов -->
-            <div class="tariffs-section" id="tariffs-section-block">
-                <button id="reveal-tariffs-btn" class="liquid-reveal-btn" onclick="toggleTariffs()">
-                    ПОСМОТРЕТЬ ТАРИФЫ
-                </button>
-                <div class="tariffs-flow-container hidden-flow" id="tariffs-flow">
-                    <div class="tariffs-grid">
-                        <div class="tariff-card" id="tariff-1m" onclick="selectTariff(1)">
-                            <div class="tariff-title">1 МЕСЯЦ</div>
-                            <div class="tariff-desc">Базовый доступ</div>
-                            <div class="tariff-price" id="price-1m">150 ₽</div></div>
-                        <div class="tariff-card recommended" id="tariff-3m" onclick="selectTariff(3)">
-                            <span class="badge" id="badge-3m">ВЫГОДНО</span>
-                            <div class="tariff-title">3 МЕСЯЦА</div>
-                            <div class="tariff-desc">Оптимальный выбор</div>
-                            <div class="tariff-price" id="price-3m">400 ₽</div>
-                        </div>
-                        <div class="tariff-card" id="tariff-6m" onclick="selectTariff(6)">
-                            <span class="badge hot" id="badge-6m">ХИТ 🚀</span>
-                            <div class="tariff-title">6 МЕСЯЦЕВ</div>
-                            <div class="tariff-desc">Максимальный комфорт</div>
-                            <div class="tariff-price" id="price-6m">650 ₽</div>
-                        </div>
-                        <div class="tariff-card vip" id="tariff-12m" onclick="selectTariff(12)">
-                            <span class="badge vip-badge" id="badge-12m">VIP 🪐</span>
-                            <div class="tariff-title">12 МЕСЯЦЕВ</div>
-                            <div class="tariff-desc">Безлимит на год</div>
-                            <div class="tariff-price" id="price-12m">990 ₽</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==========================================
-             🎮 ЭКРАН 3: КОСМИЧЕСКИЕ ИГРЫ (ОБНОВЛЕННЫЙ)
-             ========================================== -->
-        <div id="screen-games" class="screen">
-            <div class="game-lock-overlay" id="game-lock-screen">
-                <div class="lock-icon">🔒</div>
-                <h3>ОХОТА ЗАБЛОКИРОВАНА</h3>
-                <p>Доступ к Космической Охоте открывается только при наличии любого активного тарифа. Приобрети подписку в Кабинете, чтобы разблокировать игры! 🪐</p>
-            </div>
-
-            <div class="games-header">
-                <h2>🎮 КОСМИЧЕСКАЯ ОХОТА</h2>
-                <div class="games-stats-bar">
-                    <div class="stat-bubble">
-                        <span>🛰 РЕФ-ПРОЦЕНТ:</span>
-                        <b id="game-ref-percent">5.0% / 40%</b>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Круглый радар без лишнего текста -->
-            <div class="game-radar-box" id="game-radar">
-                <div class="radar-circle-glow">
-                    <div class="radar-line-scanner"></div>
-                </div>
-                <div class="radar-inner-canvas" id="radar-stage"></div>
-            </div>
-
-            <!-- Вертикальный Слот-Барабан Скидок -->
-            <div class="space-slot-container hidden-slot" id="wheel-container">
-                <div class="slot-arrow arrow-left">►</div>
-                <div class="slot-window">
-                    <div class="slot-reel" id="roulette-wheel">
-                        <div class="slot-card card-1m">1 МЕСЯЦ</div>
-                        <div class="slot-card card-3m">3 МЕСЯЦА</div>
-                        <div class="slot-card card-6m">6 МЕСЯЦЕВ</div>
-                        <div class="slot-card card-12m">VIP ДОСТУП</div>
-                        <div class="slot-card card-1m">1 МЕСЯЦ</div>
-                        <div class="slot-card card-3m">3 МЕСЯЦА</div>
-                        <div class="slot-card card-6m">6 МЕСЯЦЕВ</div>
-                        <div class="slot-card card-12m">VIP ДОСТУП</div>
-                    </div>
-                </div>
-                <div class="slot-arrow arrow-right">◄</div>
-            </div>
-
-            <button id="start-radar-btn" class="liquid-reveal-btn radar-available" onclick="startCatchGame()">
-                ЗАПУСТИТЬ СКАНИРОВАНИЕ
-            </button>
-        </div>
-
-        <!-- ==========================================
-             💡 ЭКРАН 4: ИНФОРМАЦИЯ / FAQ (ОРИГИНАЛЬНЫЙ)
-             ========================================== -->
-        <div id="screen-info" class="screen">
-            <div class="faq-header">
-                <h2>💡 БАЗА ЗНАНИЙ SOL</h2>
-            </div>
-
-            <div class="terminal-box">
-                <div class="terminal-header">
-                    <span class="term-dot red"></span>
-                    <span class="term-dot yellow"></span>
-                    <span class="term-dot green"></span>
-                    <span class="term-title">SOL_ASSISTANT v2.4</span>
-                </div>
-                <div class="terminal-body" id="terminal-text"></div>
+        <div class="status-capsule">
+            <span class="status-label">СТАТУС ПОДКЛЮЧЕНИЯ</span>
+            <div class="status-badge disconnected" id="status-badge">
+                <span class="status-dot"></span>
+                <span id="status-text">ОТКЛЮЧЕНО</span>
             </div>
             
-            <div class="faq-questions-scroll">
-                <button class="faq-btn" onclick="answerFAQ(1)">
-                    <span>❓ Как подключить VPN?</span>
-                </button>
-                <button class="faq-btn" onclick="answerFAQ(2)">
-                    <span>🔑 Где взять и вставить ключ VLESS?</span>
-                </button>
-                <button class="faq-btn" onclick="answerFAQ(5)">
-                    <span>📈 Как увеличить процент рефералки?</span>
-                </button>
-                <button class="faq-btn" onclick="answerFAQ(6)">
-                    <span>🚫 Игры не запускаются, что делать?</span>
-                </button>
-                <button class="faq-btn" onclick="answerFAQ(7)">
-                    <span>☄️ Как ловить кометы в игре?</span>
-                </button>
+            <div class="telemetry-bar hidden" id="telemetry-bar">
+                <span>ПИНГ: <b id="ping-val">24</b> ms</span>
+                <span class="divider">|</span>
+                <span>ПРОТОКОЛ: <b>VLESS</b></span>
             </div>
         </div>
 
-        <!-- ==========================================
-             🧭 НАВИГАЦИЯ (ОРИГИНАЛЬНАЯ)
-             ========================================== -->
-        <nav class="bottom-nav">
-            <div class="nav-liquid-box" id="nav-liquid-box"></div>
+        <div class="connect-button-wrapper">
+            <div class="liquid-button-container">
+                <div class="micro-waves-box" id="micro-waves-box"></div>
+                <button class="power-button liquid-water-drop" id="connect-btn"></button>
+                <div id="liquid-drops-box"></div>
+            </div>
+        </div>
 
-            <button class="nav-item active" id="btn-nav-0" onclick="switchNav(0, 'connect')">
-                <span class="nav-icon">🌌</span>
-                <span class="nav-text">Тоннель</span>
+        <div class="key-btn-container">
+            <button class="action-btn key-glow-btn hidden-slide" id="copy-key-btn" onclick="copyVlessKey()">
+                🔑 СКОПИРОВАТЬ КЛЮЧ VLESS
             </button>
-            <button class="nav-item" id="btn-nav-1" onclick="switchNav(1, 'profile')">
-                <span class="nav-icon">👤</span>
-                <span class="nav-text">Кабинет</span>
-            </button>
-            <button class="nav-item" id="btn-nav-2" onclick="switchNav(2, 'games')">
-                <span class="nav-icon">🎮</span>
-                <span class="nav-text">Игры</span>
-            </button>
-            <button class="nav-item" id="btn-nav-3" onclick="switchNav(3, 'info')">
-                <span class="nav-icon">💡</span>
-                <span class="nav-text">Инфо</span>
-            </button>
-        </nav>
-
+        </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-    <script src="app.js"></script>
+    <!-- ЭКРАН 2: КАБИНЕТ -->
+    <div class="screen" id="screen-profile">
+        <div class="profile-header">
+            <h2>👤 ТВОЙ ПРОФИЛЬ SOL</h2>
+        </div>
+
+        <div class="sub-card">
+            <div class="sub-info">
+                <span>СРОК ДЕЙСТВИЯ ПОДПИСКИ</span>
+                <p id="sub-days-left">0 дней</p>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="sub-progress-bar"></div>
+            </div>
+        </div>
+
+        <div class="quick-actions-grid">
+            <div class="action-card" id="promo-trigger-card" onclick="togglePromoCard()">
+                <span class="act-icon">🎁</span>
+                <span class="act-title">Промокод</span>
+            </div>
+            <div class="action-card" id="ref-trigger-card" onclick="toggleRefCard()">
+                <span class="act-icon">👥</span>
+                <span class="act-title">Рефералка</span>
+            </div>
+        </div>
+
+        <div class="promo-drawer-container hidden-drawer" id="promo-drawer">
+            <div class="promo-card-box" id="promo-card-element">
+                <div class="promo-header">
+                    <div class="promo-title-wrap">
+                        <span id="promo-header-text">🎁 ВВЕДИТЕ ПРОМОКОД</span>
+                        <span class="promo-status-msg" id="promo-status-msg"></span>
+                    </div>
+                    <button class="close-promo-btn" onclick="togglePromoCard()">✕</button>
+                </div>
+                <div class="promo-input-row">
+                    <input type="text" id="promo-input-field" placeholder="Например: SOL2025">
+                    <button class="apply-promo-btn" id="promo-apply-btn" onclick="applyPromoCode()">ОК</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="promo-drawer-container hidden-drawer" id="ref-drawer">
+            <div class="ref-card-box">
+                <div class="promo-header">
+                    <span>👥 РЕФЕРАЛЬНАЯ СИСТЕМА</span>
+                    <button class="close-promo-btn" onclick="toggleRefCard()">✕</button>
+                </div>
+                <div class="ref-stats-row">
+                    <div class="ref-stat-item">
+                        <span class="ref-label">ВАША СТАВКА:</span>
+                        <span class="ref-val" id="ref-percent-val">5.0%</span>
+                    </div>
+                    <div class="ref-stat-item info-align-right">
+                        <span class="ref-label">МАКС. СТАВКА:</span>
+                        <span class="ref-val max-color">40.0%</span>
+                    </div>
+                </div>
+                <p class="ref-hint-text">Поднимайте свой процент в разделе "Игры", чтобы получать больше от покупок друзей!</p>
+                <div class="promo-input-row">
+                    <input type="text" id="ref-link-field" value="https://t.me/sol_vpn_bot?start=ref12345" readonly>
+                    <button class="apply-promo-btn" onclick="copyRefLinkDirect()">📋</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tariffs-section">
+            <button class="liquid-reveal-btn" onclick="toggleTariffs()">ПОСМОТРЕТЬ ТАРИФЫ</button>
+            <div class="tariffs-flow-container hidden-flow" id="tariffs-flow">
+                <div class="tariffs-grid">
+                    <div class="tariff-card" id="tariff-1m" onclick="selectTariff(1)">
+                        <div>
+                            <div class="tariff-title">1 МЕСЯЦ</div>
+                            <div class="tariff-desc">Базовый доступ</div>
+                        </div>
+                        <div class="tariff-price" id="price-1m">150 ₽</div>
+                        <div class="tariff-term-tag">1 МЕС.</div>
+                    </div>
+                    
+                    <div class="tariff-card recommended" id="tariff-3m" onclick="selectTariff(3)">
+                        <div class="badge" id="badge-3m">ТОП</div>
+                        <div>
+                            <div class="tariff-title">3 МЕСЯЦА</div>
+                            <div class="tariff-desc">Оптимальный выбор</div>
+                        </div>
+                        <div class="tariff-price" id="price-3m">400 ₽</div>
+                        <div class="tariff-term-tag">3 МЕС.</div>
+                    </div>
+
+                    <div class="tariff-card" id="tariff-6m" onclick="selectTariff(6)">
+                        <div class="badge hot" id="badge-6m">ВЫГОДА</div>
+                        <div>
+                            <div class="tariff-title">6 МЕСЯЦЕВ</div>
+                            <div class="tariff-desc">Максимальный комфорт</div>
+                        </div>
+                        <div class="tariff-price" id="price-6m">650 ₽</div>
+                        <div class="tariff-term-tag">6 МЕС.</div>
+                    </div>
+
+                    <div class="tariff-card vip" id="tariff-12m" onclick="selectTariff(12)">
+                        <div class="badge vip-badge" id="badge-12m">VIP</div>
+                        <div>
+                            <div class="tariff-title">12 МЕСЯЦЕВ</div>
+                            <div class="tariff-desc">Безлимит на год</div>
+                        </div>
+                        <div class="tariff-price" id="price-12m">990 ₽</div>
+                        <div class="tariff-term-tag">12 МЕС.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ЭКРАН3: ИГРЫ -->
+    <div class="screen" id="screen-games">
+        <div class="game-lock-overlay hidden" id="game-lock-screen">
+            <div class="lock-icon">🔒</div>
+            <h3>ДОСТУП ОГРАНИЧЕН</h3>
+            <p>Для участия в космической охоте необходима активная подписка SOL VPN.</p>
+        </div>
+
+        <div class="games-header">
+            <h2>🎮 КОСМИЧЕСКАЯ ОХОТА</h2>
+            <div class="games-stats-bar">
+                <div class="stat-bubble">
+                    <span>🪐 РЕФ-ПРОЦЕНТ:</span>
+                    <b id="game-ref-percent">5.0% / 40%</b>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-radar-box" id="radar-stage">
+            <div class="radar-circle-glow">
+                <div class="radar-line-scanner"></div>
+            </div>
+        </div>
+
+        <button class="liquid-reveal-btn radar-available" id="start-radar-btn" onclick="startCatchGame()">
+            ЗАПУСТИТЬ СКАНИРОВАНИЕ
+        </button>
+
+        <div class="space-slot-container" id="wheel-container">
+            <div class="slot-arrow">►</div>
+            <div class="slot-window">
+                <div class="slot-reel" id="roulette-wheel"></div>
+            </div>
+            <div class="slot-arrow">◄</div>
+        </div>
+
+        <div class="game-loot-middle-container">
+            <div class="crystal-container-row show-row" id="game-loot-middle-row"></div>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 4: ИНФО -->
+    <div class="screen" id="screen-info">
+        <div class="faq-header">
+            <h2>💡 БАЗА ЗНАНИЙ</h2>
+        </div>
+
+        <div class="terminal-box">
+            <div class="terminal-header">
+                <span class="term-dot red"></span>
+                <span class="term-dot yellow"></span>
+                <span class="term-dot green"></span>
+                <span class="term-title">SOL_ASSISTANT_TERMINAL v2.5</span>
+            </div>
+            <div class="terminal-body" id="terminal-text"></div>
+        </div>
+
+        <div class="faq-questions-scroll">
+            <button class="faq-btn" onclick="answerFAQ(1)">🚀 Как подключить VPN?</button>
+            <button class="faq-btn" onclick="answerFAQ(2)">🔑 Где взять VLESS ключ?</button>
+            <button class="faq-btn" onclick="answerFAQ(5)">📈 Как поднять % рефералки?</button>
+            <button class="faq-btn" onclick="answerFAQ(6)">🔒 Почему заблокированы игры?</button>
+            <button class="faq-btn" onclick="answerFAQ(7)">☄️ Как ловить кометы?</button>
+        </div>
+    </div>
+
+    <!-- НАВИГАЦИЯ -->
+    <nav class="bottom-nav">
+        <div class="nav-liquid-box" id="nav-liquid-box"></div>
+        <button class="nav-item active" id="btn-nav-0" onclick="switchNav(0, 'tunnel')">
+            <span class="nav-icon">⚡️</span>
+            <span class="nav-text">Тоннель</span>
+        </button>
+        <button class="nav-item" id="btn-nav-1" onclick="switchNav(1, 'profile')">
+            <span class="nav-icon">👤</span>
+            <span class="nav-text">Кабинет</span>
+        </button>
+        <button class="nav-item" id="btn-nav-2" onclick="switchNav(2, 'games')">
+            <span class="nav-icon">🎮</span>
+            <span class="nav-text">Игры</span>
+        </button>
+        <button class="nav-item" id="btn-nav-3" onclick="switchNav(3, 'info')">
+            <span class="nav-icon">💡</span>
+            <span class="nav-text">Инфо</span>
+        </button>
+    </nav>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
