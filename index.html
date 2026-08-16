@@ -56,8 +56,7 @@
 
         <div class="key-btn-container">
             <button class="action-btn key-glow-btn hidden-slide" id="copy-key-btn" onclick="copyVlessKey()">
-                🔑 СКОПИРОВАТЬ КЛЮЧ VLESS
-            </button>
+                🔑 СКОПИРОВАТЬ КЛЮЧ VLESS</button>
         </div>
     </div>
 
@@ -98,7 +97,7 @@
                     <button class="close-promo-btn" onclick="togglePromoCard()">✕</button>
                 </div>
                 <div class="promo-input-row">
-                    <input type="text" id="promo-input-field" placeholder="Например: SOL2025">
+                    <input type="text" id="promo-input-field" placeholder="Например: SOL2026">
                     <button class="apply-promo-btn" id="promo-apply-btn" onclick="applyPromoCode()">ОК</button>
                 </div>
             </div>
@@ -138,17 +137,16 @@
                             <div class="tariff-desc">Базовый доступ</div>
                         </div>
                         <div class="tariff-price" id="price-1m">150 ₽</div>
-                        <div class="tariff-term-tag">1 МЕС.</div>
+                        <div class="tariff-discount-tag" id="discount-tag-1m"></div>
                     </div>
                     
                     <div class="tariff-card recommended" id="tariff-3m" onclick="selectTariff(3)">
-                        <div class="badge" id="badge-3m">ТОП</div>
-                        <div>
+                        <div class="badge" id="badge-3m">ТОП</div><div>
                             <div class="tariff-title">3 МЕСЯЦА</div>
                             <div class="tariff-desc">Оптимальный выбор</div>
                         </div>
                         <div class="tariff-price" id="price-3m">400 ₽</div>
-                        <div class="tariff-term-tag">3 МЕС.</div>
+                        <div class="tariff-discount-tag" id="discount-tag-3m"></div>
                     </div>
 
                     <div class="tariff-card" id="tariff-6m" onclick="selectTariff(6)">
@@ -158,7 +156,7 @@
                             <div class="tariff-desc">Максимальный комфорт</div>
                         </div>
                         <div class="tariff-price" id="price-6m">650 ₽</div>
-                        <div class="tariff-term-tag">6 МЕС.</div>
+                        <div class="tariff-discount-tag" id="discount-tag-6m"></div>
                     </div>
 
                     <div class="tariff-card vip" id="tariff-12m" onclick="selectTariff(12)">
@@ -168,14 +166,14 @@
                             <div class="tariff-desc">Безлимит на год</div>
                         </div>
                         <div class="tariff-price" id="price-12m">990 ₽</div>
-                        <div class="tariff-term-tag">12 МЕС.</div>
+                        <div class="tariff-discount-tag" id="discount-tag-12m"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ЭКРАН3: ИГРЫ -->
+    <!-- ЭКРАН 3: ИГРЫ -->
     <div class="screen" id="screen-games">
         <div class="game-lock-overlay hidden" id="game-lock-screen">
             <div class="lock-icon">🔒</div>
@@ -199,7 +197,7 @@
             </div>
         </div>
 
-        <button class="liquid-reveal-btn radar-available" id="start-radar-btn" onclick="startCatchGame()">
+        <button class="liquid-reveal-btn radar-ready" id="start-radar-btn" onclick="startCatchGame()">
             ЗАПУСТИТЬ СКАНИРОВАНИЕ
         </button>
 
@@ -241,8 +239,77 @@
         </div>
     </div>
 
+    <!-- ЭКРАН 5: АДМИН-ПАНЕЛЬ -->
+    <div class="screen" id="screen-admin">
+        <div class="admin-header">
+            <h2>👑 ПАНЕЛЬ УПРАВЛЕНИЯ</h2>
+        </div>
+
+        <div class="admin-scroll-content">
+            <!-- СЕКЦИЯ: СОЗДАНИЕ ПРОМОКОДОВ -->
+            <div class="admin-card">
+                <div class="admin-card-title">🎁 СОЗДАТЬ ПРОМОКОД</div>
+                
+                <div class="promo-input-row">
+                    <input type="text" id="admin-promo-name" placeholder="НАЗВАНИЕ (НАПР. VIP30)" style="text-transform: uppercase;">
+                </div>
+
+                <!-- Кнопки независимого выбора типа -->
+                <div class="admin-toggle-row">
+                    <button class="admin-type-btn" id="btn-mode-days" onclick="toggleAdminPromoType('days')">🎁 ДНИ</button>
+                    <button class="admin-type-btn" id="btn-mode-discount" onclick="toggleAdminPromoType('discount')">🔥 СКИДКА</button>
+                </div>
+
+                <!-- Кнопки выбора типа лимитов -->
+                <div class="admin-toggle-row" style="margin-top: 8px;">
+                    <button class="admin-type-btn sub-mode active-green" id="btn-limit-days" onclick="setAdminLimitType('lifetime_days')">⏳ ДНИ ЖИЗНИ</button>
+                    <button class="admin-type-btn sub-mode" id="btn-limit-count" onclick="setAdminLimitType('activations')">👥 АКТИВАЦИИ</button>
+                </div>
+
+                <!-- ГОРИЗОНТАЛЬНЫЙ 3D-БАРАБАН И СЕНСОРНЫЙ СПИННЕР -->
+                <div class="calc-widget-container">
+                    <span class="calc-label" id="calc-field-title">ЗНАЧЕНИЕ: ДНИ ПОДПИСКИ</span>
+                    <div class="calc-control-bar">
+                        <button class="calc-step-btn" id="btn-calc-minus" onmousedown="startCalcHold(-1)" onmouseup="stopCalcHold()" onmouseleave="stopCalcHold()" ontouchstart="startCalcHold(-1)" ontouchend="stopCalcHold()">−</button>
+                        
+                        <div class="calc-horizontal-viewport" id="calc-touch-area">
+                            <div class="calc-horizontal-track" id="calc-horizontal-track">
+                                <span class="calc-num side" id="num-prev">6</span>
+                                <span class="calc-num active" id="num-center">7</span>
+                                <span class="calc-num side" id="num-next">8</span>
+                            </div>
+                        </div>
+
+                        <button class="calc-step-btn" id="btn-calc-plus" onmousedown="startCalcHold(1)" onmouseup="stopCalcHold()" onmouseleave="stopCalcHold()" ontouchstart="startCalcHold(1)" ontouchend="stopCalcHold()">+</button>
+                    </div>
+                </div>
+
+                <button class="admin-action-submit" onclick="createAdminPromo()">СОХРАНИТЬ ПРОМОКОД</button>
+            </div>
+
+            <!-- СЕКЦИЯ: ОДОБРЕННЫЕ ПОЛЬЗОВАТЕЛИ -->
+            <div class="admin-card">
+                <div class="admin-card-title">⭐️ ОДОБРЕННЫЕ ПОЛЬЗОВАТЕЛИ</div>
+                <div class="promo-input-row" style="margin-bottom: 10px;">
+                    <input type="text" id="admin-approved-input" placeholder="@username">
+                    <button class="apply-promo-btn" onclick="addApprovedUser()">+</button>
+                </div>
+
+                <div class="drum-list-viewport">
+                    <div class="drum-list-inner" id="approved-users-drum"></div>
+                </div>
+            </div>
+
+            <!-- СЕКЦИЯ: ВСЕ ПОЛЬЗОВАТЕЛИ -->
+            <div class="admin-card">
+                <div class="admin-card-title">👥 ВСЕ ПОЛЬЗОВАТЕЛИ</div>
+                <div class="all-users-scroll-list" id="all-users-container"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- НАВИГАЦИЯ -->
-    <nav class="bottom-nav">
+    <nav class="bottom-nav" id="app-bottom-nav">
         <div class="nav-liquid-box" id="nav-liquid-box"></div>
         <button class="nav-item active" id="btn-nav-0" onclick="switchNav(0, 'tunnel')">
             <span class="nav-icon">⚡️</span>
@@ -259,6 +326,10 @@
         <button class="nav-item" id="btn-nav-3" onclick="switchNav(3, 'info')">
             <span class="nav-icon">💡</span>
             <span class="nav-text">Инфо</span>
+        </button>
+        <button class="nav-item admin-only-item hidden" id="btn-nav-4" onclick="switchNav(4, 'admin')">
+            <span class="nav-icon">👑</span>
+            <span class="nav-text">Админ</span>
         </button>
     </nav>
 </div>
