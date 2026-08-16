@@ -28,20 +28,17 @@ let caughtCount = 0;
 let hasDiscountDroppedInGame = false;
 
 // 👑 СТЕЙТ АДМИН-ПАНЕЛИ
-let adminSelectedTypes = { days: false, discount: false };// Независимые кнопки
-let adminLimitType = 'lifetime_days'; 
-let calcValue = 7;
-let calcHoldTimer = null;
-let touchStartX = 0;
+let adminPromoTypes = { days: false, discount: false };
+let adminPickedTariffs = { 1: false, 3: false, 6: false, 12: false };
+let adminLimitType = 'lifetime_days';
 
-// База промокодов, создаваемых в Админке
+let calcValues = { days: 7, discount: 30, limit: 13 };
+let touchStartXs = { days: 0, discount: 0, limit: 0 };
+
 let createdPromos = {}; 
-
-// Список пользователей (очищен под будущий бот)
 let approvedUsers = [];
 let allUsersList = [];
 
-// Telegram данные
 if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
     userData = tg.initDataUnsafe.user;
     if (userData.id === ADMIN_ID) {
@@ -53,7 +50,6 @@ if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
     isSubscribedUser = true;
 }
 
-// Тарифы и базовые цены
 const originalPrices = { 1: 150, 3: 400, 6: 650, 12: 990 };
 let activeDiscounts = { 1: 0, 3: 0, 6: 0, 12: 0 };
 
@@ -101,7 +97,7 @@ function initSpaceFX() {
 }
 
 // ==========================================
-// 🗺 2. ВЕКТОРНАЯ КАРТА (135 ТОЧЕК)
+// 🗺 2. ВЕКТОРНАЯ КАРТА
 // ==========================================
 function initMap3D() {
     const continentsGroup = document.getElementById("map-continents-group");
@@ -163,7 +159,7 @@ function initMap3D() {
 }
 
 // ==========================================
-// 💧 3. КАПЛИ
+// 💧 3. КАПЛИ ВШИВЬ И ВВЕРХ
 // ==========================================
 function triggerLiquidSplash() {
     const dropsBox = document.getElementById("liquid-drops-box");
@@ -206,7 +202,7 @@ function triggerLiquidSplash() {
 }
 
 // ==========================================
-// ⚡️ 4. ПОДКЛЮЧЕНИЕ ТОННЕЛЯ (ОДИН ОДИНОЧНЫЙ ЛУЧ)
+// ⚡️ 4. ПОДКЛЮЧЕНИЕ VPN
 // ==========================================
 const connectBtn = document.getElementById("connect-btn");
 const statusBadge = document.getElementById("status-badge");
@@ -335,7 +331,7 @@ function flashCity(cityId) {
     }
 }
 
-// 🔑 5. КОПИРОВАНИЕ КЛЮЧА
+// 🔑 КОПИРОВАНИЕ КЛЮЧА
 function copyVlessKey() {
     const dummyKey = "vless://sol-vpn-node-amsterdam-secure-key-9981273";
     navigator.clipboard.writeText(dummyKey);
@@ -344,12 +340,11 @@ function copyVlessKey() {
 }
 
 // ==========================================
-// 🎁 6. ПРОМОКОДЫ И РЕФЕРАЛКА С СОХРАНЕНИЕМ СОСТОЯНИЯ
+// 🎁 5. ПРОМОКОДЫ И РЕФЕРАЛКА
 // ==========================================
 function togglePromoCard(forceState = null) {
     const drawer = document.getElementById("promo-drawer");
     const promoCardTrigger = document.getElementById("promo-trigger-card");
-    const inputField = document.getElementById("promo-input-field");
 
     if (forceState !== null) {
         isPromoOpen = forceState;
@@ -361,11 +356,9 @@ function togglePromoCard(forceState = null) {
         if (isRefOpen) toggleRefCard(false);
         if (drawer) drawer.classList.remove("hidden-drawer");
         if (promoCardTrigger) promoCardTrigger.classList.add("active-card");
-        setTimeout(() => { if (inputField) inputField.focus(); }, 200);
     } else {
         if (drawer) drawer.classList.add("hidden-drawer");
         if (promoCardTrigger) promoCardTrigger.classList.remove("active-card");
-        if (inputField) inputField.blur();
         resetPromoStyles();
     }
     if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
@@ -425,13 +418,21 @@ function applyPromoCode() {
             isSubscribedUser = true;
             const leftVal = document.getElementById("sub-days-left");
             const bar = document.getElementById("sub-progress-bar");
-            if (leftVal) leftVal.innerText = `${promoData.val} дней`;
+            if (leftVal) leftVal.innerText = `${promoData.daysVal} дней`;
             if (bar) bar.style.width = "100%";
         }
         
         if (promoData.hasDiscount) {
-            activeDiscounts[1] = promoData.val;
-            activeDiscounts[3] = promoData.val;
+            if (promoData.tariffs) {
+                Object.keys(promoData.tariffs).forEach(t => {
+                    if (promoData.tariffs[t]) {
+                        activeDiscounts[t] = promoData.discountVal;
+                    }
+                });
+            } else {
+                activeDiscounts[1] = promoData.discountVal;
+                activeDiscounts[3] = promoData.discountVal;
+            }
             updateTariffPricesUI();
         }
 
@@ -497,7 +498,7 @@ function checkGameLockStatus() {
 }
 
 // ==========================================
-// 🎮 7. ИГРЫ (ИСПРАВЛЕННЫЕ КОМЕТЫ)
+// 🎮 6. ИГРЫ
 // ==========================================
 function startCatchGame() {
     if (isGameRunning) return;
@@ -573,7 +574,9 @@ function startCatchGame() {
 
 function spawnComet(index, speed) {
     const stage = document.getElementById("radar-stage");
-    if (!stage) return;const comet = document.createElement("div");
+    if (!stage) return;
+
+    const comet = document.createElement("div");
     comet.className = "comet";
     
     const colors = ["#3b82f6", "#10b981", "#ffffff", "#c084fc"];
@@ -617,8 +620,7 @@ function spawnComet(index, speed) {
 
         if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("heavy");
         
-        const slot = document.getElementById(`loot-slot-${caughtCount}`);
-        if (slot) {
+        const slot = document.getElementById(`loot-slot-${caughtCount}`);if (slot) {
             caughtCount++;
             
             const cometRect = comet.getBoundingClientRect();
@@ -840,7 +842,7 @@ function updateTariffPricesUI() {
             
             if (tagEl) {
                 tagEl.innerText = `🔥 -${activeDiscounts[t]}%`;
-                tagEl.style.color = neons[t];
+                tagEl.style.color =neons[t];
                 tagEl.style.textShadow = `0 0 8px ${neons[t]}`;
                 tagEl.className = "tariff-discount-tag show-tag";
             }
@@ -852,7 +854,7 @@ function updateTariffPricesUI() {
 }
 
 // ==========================================
-// 👑 8. ЛОГИКА АДМИН-ПАНЕЛИ (ГОРИЗОНТАЛЬНЫЙ СПИННЕР)
+// 👑 7. АДМИН-ПАНЕЛЬ
 // ==========================================
 function initAdminPanel() {
     if (!isAdmin) return;
@@ -863,114 +865,135 @@ function initAdminPanel() {
     if (nav) nav.classList.add("nav-5-items");
     if (adminBtn) adminBtn.classList.remove("hidden");
 
-    initCalcTouchAndWheel();
+    initCalcControls('days');
+    initCalcControls('discount');
+    initCalcControls('limit');
+
     renderApprovedUsersDrum();
     renderAllUsersList();
-    updateCalcDisplay();
+
+    updateCalcDisplays();
 }
 
 function toggleAdminPromoType(type) {
-    adminSelectedTypes[type] = !adminSelectedTypes[type];
-    const btn = document.getElementById(`btn-mode-${type}`);
+    adminPromoTypes[type] = !adminPromoTypes[type];
+    
+    const btnDays = document.getElementById("btn-mode-days");
+    const btnDiscount = document.getElementById("btn-mode-discount");
+    
+    const blockDays = document.getElementById("block-days");
+    const blockDiscount = document.getElementById("block-discount");
+    const blockTariffs = document.getElementById("block-tariffs");
 
-    if (btn) {
-        if (adminSelectedTypes[type]) {
-            btn.classList.add("active-green");
-        } else {
-            btn.classList.remove("active-green");
-        }
+    if (adminPromoTypes.days) {
+        if (btnDays) btnDays.classList.add("active-green");
+        if (blockDays) blockDays.className = "calc-widget-container active-green-block";
+    } else {
+        if (btnDays) btnDays.classList.remove("active-green");
+        if (blockDays) blockDays.className = "calc-widget-container disabled-block";
     }
-    updateCalcDisplay();
+
+    if (adminPromoTypes.discount) {
+        if (btnDiscount) btnDiscount.classList.add("active-green");
+        if (blockDiscount) blockDiscount.className = "calc-widget-container active-green-block";
+        if (blockTariffs) blockTariffs.className = "admin-tariffs-row-sketch active-green-block";
+    } else {
+        if (btnDiscount) btnDiscount.classList.remove("active-green");
+        if (blockDiscount) blockDiscount.className = "calc-widget-container disabled-block";
+        if (blockTariffs) blockTariffs.className = "admin-tariffs-row-sketch disabled-block";
+    }
+
+    updateCalcDisplays();
     if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
+}
+
+function toggleAdminTariffPick(m) {
+    if (!adminPromoTypes.discount) return;
+    adminPickedTariffs[m] = !adminPickedTariffs[m];
+    const btn = document.getElementById(`p-tariff-${m}m`);
+    if (btn) {
+        if (adminPickedTariffs[m]) btn.classList.add("selected");
+        else btn.classList.remove("selected");
+    }
+    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("selection_change");
 }
 
 function setAdminLimitType(type) {
     adminLimitType = type;
     const btnDays = document.getElementById("btn-limit-days");
     const btnCount = document.getElementById("btn-limit-count");
+    const limitTitle = document.getElementById("limit-calc-title");
 
     if (type === 'lifetime_days') {
         if (btnDays) btnDays.className = "admin-type-btn sub-mode active-green";
         if (btnCount) btnCount.className = "admin-type-btn sub-mode";
+        if (limitTitle) limitTitle.innerText = "ВЫБЕРИТЕ СРОК ЖИЗНИ (ДНИ)";
     } else {
         if (btnDays) btnDays.className = "admin-type-btn sub-mode";
         if (btnCount) btnCount.className = "admin-type-btn sub-mode active-green";
+        if (limitTitle) limitTitle.innerText = "ВЫБЕРИТЕ КОЛИЧЕСТВО АКТИВАЦИЙ";
     }
-    updateCalcDisplay();
+    updateCalcDisplays();
     if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
 }
 
-// 🎡 ГОРИЗОНТАЛЬНОЕ ОБНОВЛЕНИЕ ЧИСЕЛ В БАРАБАНЕ
-function updateCalcDisplay() {
-    const title = document.getElementById("calc-field-title");
-    const numPrev = document.getElementById("num-prev");
-    const numCenter = document.getElementById("num-center");
-    const numNext = document.getElementById("num-next");
+function updateCalcDisplays() {
+    let maxDays = 365;
+    calcValues.days = Math.max(1, Math.min(maxDays, calcValues.days));
+    renderSingleSpinner('days', calcValues.days, maxDays);
 
-    let textTitle = "ЗНАЧЕНИЕ: ";
-    if (adminSelectedTypes.days && adminSelectedTypes.discount) textTitle += "ДНИИ + СКИДКА";
-    else if (adminSelectedTypes.days) textTitle += "БЕСПЛАТНЫЕ ДНИ";
-    else if (adminSelectedTypes.discount) textTitle += "СКИДКА В %";
-    else textTitle += "ВЫБЕРИТЕ ТИП ВЫШЕ";
+    let maxDiscount = 100;
+    calcValues.discount = Math.max(1, Math.min(maxDiscount, calcValues.discount));
+    renderSingleSpinner('discount', calcValues.discount, maxDiscount);
 
-    let maxVal = 100;
-    if (adminLimitType === 'lifetime_days') {
-        textTitle += " (СРОК: 1-31 ДН.)";
-        maxVal = 31;
-    } else {
-        textTitle += " (ЛИМИТ: 1-1000 ЧЕЛ.)";
-        maxVal = 1000;
-    }
-
-    calcValue = Math.max(1, Math.min(maxVal, calcValue));
-
-    if (title) title.innerText = textTitle;
-
-    if (numCenter) numCenter.innerText = calcValue;
-    if (numPrev) numPrev.innerText = (calcValue > 1) ? calcValue - 1 : "";
-    if (numNext) numNext.innerText = (calcValue < maxVal) ? calcValue + 1 : "";
+    let maxLimit = (adminLimitType === 'lifetime_days') ? 31 : 1000;
+    calcValues.limit = Math.max(1, Math.min(maxLimit, calcValues.limit));
+    renderSingleSpinner('limit', calcValues.limit, maxLimit);
 }
 
-function changeCalcVal(delta) {
-    calcValue += delta;
-    updateCalcDisplay();
+function renderSingleSpinner(key, val, maxVal) {
+    const numPrev = document.getElementById(`${key}-prev`);
+    const numCenter = document.getElementById(`${key}-center`);
+    const numNext = document.getElementById(`${key}-next`);
+
+    if (numCenter) numCenter.innerText = val;
+    if (numPrev) numPrev.innerText = (val > 1) ? val - 1 : "";
+    if (numNext) numNext.innerText = (val < maxVal) ? val + 1 : "";
+}
+
+function changeCalcVal(key, delta) {
+    if (key === 'days' && !adminPromoTypes.days) return;
+    if (key === 'discount' && !adminPromoTypes.discount) return;
+
+    calcValues[key] += delta;
+    updateCalcDisplays();
     if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("selection_change");
 }
 
-function startCalcHold(delta) {
-    changeCalcVal(delta);
-    calcHoldTimer = setInterval(() => {
-        changeCalcVal(delta);
-    }, 120);
-}
-
-function stopCalcHold() {
-    if (calcHoldTimer) clearInterval(calcHoldTimer);
-}
-
-function initCalcTouchAndWheel() {
-    const area = document.getElementById("calc-touch-area");
+function initCalcControls(key) {
+    const area = document.getElementById(`touch-area-${key}`);
     if (!area) return;
 
+    area.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        if (e.deltaY < 0) changeCalcVal(key, 1);
+        else changeCalcVal(key, -1);
+    }, { passive: false });
+
     area.addEventListener("touchstart", (e) => {
-        touchStartX = e.touches[0].clientX;
-    });
+        touchStartXs[key] = e.touches[0].clientX;
+    }, { passive: true });
 
     area.addEventListener("touchmove", (e) => {
         const currentX = e.touches[0].clientX;
-        const diff = touchStartX - currentX;
+        const diff = touchStartXs[key] - currentX;
 
-        if (Math.abs(diff) > 18) {
-            if (diff > 0) changeCalcVal(1);
-            else changeCalcVal(-1);
-            touchStartX = currentX;
+        if (Math.abs(diff) > 15) {
+            if (diff > 0) changeCalcVal(key, 1);
+            else changeCalcVal(key, -1);
+            touchStartXs[key] = currentX;
         }
-    });
-
-    area.addEventListener("wheel", (e) => {
-        if (e.deltaY < 0) changeCalcVal(1);
-        else changeCalcVal(-1);
-    });
+    }, { passive: true });
 }
 
 function createAdminPromo() {
@@ -983,19 +1006,28 @@ function createAdminPromo() {
         return;
     }
 
+    if (!adminPromoTypes.days && !adminPromoTypes.discount) {
+        alert("🚨 Выберите хотя бы одну опцию: ДНИ или СКИДКИ!");
+        return;
+    }
+
     createdPromos[name] = {
-        hasDays: adminSelectedTypes.days,
-        hasDiscount: adminSelectedTypes.discount,
-        val: calcValue,
-        limitType: adminLimitType
+        hasDays: adminPromoTypes.days,
+        daysVal: calcValues.days,
+        hasDiscount: adminPromoTypes.discount,
+        discountVal: calcValues.discount,
+        tariffs: { ...adminPickedTariffs },
+        limitType: adminLimitType,
+        limitVal: calcValues.limit
     };
 
-    alert(`🎉 Промокод ${name} успешно сохранен!\nДни: ${adminSelectedTypes.days ? 'ДА' : 'НЕТ'}\nСкидка: ${adminSelectedTypes.discount ? 'ДА' : 'НЕТ'}\nЗначение: ${calcValue}`);
+    alert(`🎉 Промокод "${name}" сохранен!\n🎁 Дни: ${adminPromoTypes.days ? calcValues.days : 'НЕТ'}\n🔥 Скидка: ${adminPromoTypes.discount ? calcValues.discount + '%' : 'НЕТ'}\n⏳ Лимит: ${calcValues.limit}`);
+    
     input.value = "";
     if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
 }
 
-// ❌ ОДОБРЕННЫЕ ПОЛЬЗОВАТЕЛИ (С КРЕСТИКОМ УДАЛЕНИЯ)
+// ❌ ОДОБРЕННЫЕ ПОЛЬЗОВАТЕЛИ
 function renderApprovedUsersDrum() {
     const drum = document.getElementById("approved-users-drum");
     if (!drum) return;
@@ -1037,7 +1069,13 @@ function removeApprovedUser(index) {
 }
 
 // 👥 ВСЕ ПОЛЬЗОВАТЕЛИ
-function renderAllUsersList() {
+function filterAllUsersList() {
+    const searchInput = document.getElementById("admin-search-user");
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
+    renderAllUsersList(query);
+}
+
+function renderAllUsersList(filterQuery = "") {
     const container = document.getElementById("all-users-container");
     if (!container) return;
 
@@ -1046,8 +1084,17 @@ function renderAllUsersList() {
         return;
     }
 
+    const filtered = allUsersList.filter(u => 
+        u.name.toLowerCase().includes(filterQuery) || u.username.toLowerCase().includes(filterQuery)
+    );
+
+    if (filtered.length === 0) {
+        container.innerHTML = `<div class="empty-list-msg">Никого не найдено по запросу "${filterQuery}"</div>`;
+        return;
+    }
+
     let html = "";
-    allUsersList.forEach(u => {
+    filtered.forEach(u => {
         const subClass = u.hasSub ? "active-sub" : "";
         const statusTxt = u.hasSub ? "ПОДПИСКА АКТИВНА" : "НЕТ ПОДПИСКИ";
         const statusColor = u.hasSub ? "sub-on" : "sub-off";
@@ -1083,7 +1130,7 @@ function giftPromoToUser(username, e) {
 }
 
 // ==========================================
-// 💡 9. БАЗА ЗНАНИЙ
+// 💡 8. БАЗА ЗНАНИЙ
 // ==========================================
 const defaultInfoText = "Нажмите на любой вопрос ниже. Ваш ответ появится здесь. Если нужной темы нет — напишите в нашу техподдержку.";
 
@@ -1136,7 +1183,7 @@ function answerFAQ(id) {
 }
 
 // ==========================================
-// 📂 10. ТАРИФЫ
+// 📂 9. ТАРИФЫ
 // ==========================================
 function toggleTariffs() {
     const flowContainer = document.getElementById("tariffs-flow");
@@ -1178,7 +1225,7 @@ function selectTariff(months) {
 }
 
 // ==========================================
-// 🧭 11. НАВИГАЦИЯ С СОХРАНЕНИЕМ СОСТОЯНИЙ
+// 🧭 10. НАВИГАЦИЯ
 // ==========================================
 function switchNav(index, screenId) {
     document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
@@ -1236,15 +1283,14 @@ function generateLongSmartPath() {
     }
 
     if (selectedNodes.length < 5) {
-        const shuffled = [...allCitiesList].sort(() => 0.5 - Math.random());
-        selectedNodes = shuffled.slice(0, 5);
+        const shuffled = [...allCitiesList].sort(() => 0.5 - Math.random());selectedNodes = shuffled.slice(0, 5);
     }
 
     return selectedNodes;
 }
 
 // ==========================================
-// 🏁 12. ТОЧКА ВХОДА
+// 🏁 11. ТОЧКА ВХОДА
 // ==========================================
 window.onload = () => {
     initSpaceFX();

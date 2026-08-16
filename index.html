@@ -83,8 +83,7 @@
             </div>
             <div class="action-card" id="ref-trigger-card" onclick="toggleRefCard()">
                 <span class="act-icon">👥</span>
-                <span class="act-title">Рефералка</span>
-            </div>
+                <span class="act-title">Рефералка</span></div>
         </div>
 
         <div class="promo-drawer-container hidden-drawer" id="promo-drawer">
@@ -141,7 +140,8 @@
                     </div>
                     
                     <div class="tariff-card recommended" id="tariff-3m" onclick="selectTariff(3)">
-                        <div class="badge" id="badge-3m">ТОП</div><div>
+                        <div class="badge" id="badge-3m">ТОП</div>
+                        <div>
                             <div class="tariff-title">3 МЕСЯЦА</div>
                             <div class="tariff-desc">Оптимальный выбор</div>
                         </div>
@@ -246,48 +246,82 @@
         </div>
 
         <div class="admin-scroll-content">
-            <!-- СЕКЦИЯ: СОЗДАНИЕ ПРОМОКОДОВ -->
+            <!-- 1. СОЗДАНИЕ ПРОМОКОДОВ -->
             <div class="admin-card">
                 <div class="admin-card-title">🎁 СОЗДАТЬ ПРОМОКОД</div>
                 
-                <div class="promo-input-row">
+                <div class="promo-input-row" style="margin-bottom: 12px;">
                     <input type="text" id="admin-promo-name" placeholder="НАЗВАНИЕ (НАПР. VIP30)" style="text-transform: uppercase;">
                 </div>
 
-                <!-- Кнопки независимого выбора типа -->
                 <div class="admin-toggle-row">
                     <button class="admin-type-btn" id="btn-mode-days" onclick="toggleAdminPromoType('days')">🎁 ДНИ</button>
                     <button class="admin-type-btn" id="btn-mode-discount" onclick="toggleAdminPromoType('discount')">🔥 СКИДКА</button>
+                </div><!-- Калькулятор Дней -->
+                <div class="calc-widget-container disabled-block" id="block-days">
+                    <span class="calc-label">КОЛИЧЕСТВО ДНЕЙ ПОДПИСКИ</span>
+                    <div class="calc-control-bar">
+                        <button class="calc-step-btn" onclick="changeCalcVal('days', -1)">−</button>
+                        <div class="calc-horizontal-viewport" id="touch-area-days">
+                            <div class="calc-horizontal-track">
+                                <span class="calc-num side" id="days-prev">6</span>
+                                <span class="calc-num active" id="days-center">7</span>
+                                <span class="calc-num side" id="days-next">8</span>
+                            </div>
+                        </div>
+                        <button class="calc-step-btn" onclick="changeCalcVal('days', 1)">+</button>
+                    </div>
                 </div>
 
-                <!-- Кнопки выбора типа лимитов -->
-                <div class="admin-toggle-row" style="margin-top: 8px;">
+                <!-- Калькулятор Скидки -->
+                <div class="calc-widget-container disabled-block" id="block-discount">
+                    <span class="calc-label">ПРОЦЕНТ СКИДКИ (%)</span>
+                    <div class="calc-control-bar">
+                        <button class="calc-step-btn" onclick="changeCalcVal('discount', -1)">−</button>
+                        <div class="calc-horizontal-viewport" id="touch-area-discount">
+                            <div class="calc-horizontal-track">
+                                <span class="calc-num side" id="discount-prev">29</span>
+                                <span class="calc-num active" id="discount-center">30</span>
+                                <span class="calc-num side" id="discount-next">31</span>
+                            </div>
+                        </div>
+                        <button class="calc-step-btn" onclick="changeCalcVal('discount', 1)">+</button>
+                    </div>
+                </div>
+
+                <!-- Выбор тарифов для скидки -->
+                <div class="admin-tariffs-row-sketch disabled-block" id="block-tariffs">
+                    <button class="t-sketch-btn" id="p-tariff-1m" onclick="toggleAdminTariffPick(1)">1 МЕС</button>
+                    <button class="t-sketch-btn" id="p-tariff-3m" onclick="toggleAdminTariffPick(3)">3 МЕС</button>
+                    <button class="t-sketch-btn" id="p-tariff-6m" onclick="toggleAdminTariffPick(6)">6 МЕС</button>
+                    <button class="t-sketch-btn" id="p-tariff-12m" onclick="toggleAdminTariffPick(12)">12 МЕС</button>
+                </div>
+
+                <div class="admin-toggle-row" style="margin-top: 12px;">
                     <button class="admin-type-btn sub-mode active-green" id="btn-limit-days" onclick="setAdminLimitType('lifetime_days')">⏳ ДНИ ЖИЗНИ</button>
                     <button class="admin-type-btn sub-mode" id="btn-limit-count" onclick="setAdminLimitType('activations')">👥 АКТИВАЦИИ</button>
                 </div>
 
-                <!-- ГОРИЗОНТАЛЬНЫЙ 3D-БАРАБАН И СЕНСОРНЫЙ СПИННЕР -->
-                <div class="calc-widget-container">
-                    <span class="calc-label" id="calc-field-title">ЗНАЧЕНИЕ: ДНИ ПОДПИСКИ</span>
+                <!-- Калькулятор Лимитов -->
+                <div class="calc-widget-container active-green-block" id="block-limit">
+                    <span class="calc-label" id="limit-calc-title">ВЫБЕРИТЕ СРОК ЖИЗНИ (ДНИ)</span>
                     <div class="calc-control-bar">
-                        <button class="calc-step-btn" id="btn-calc-minus" onmousedown="startCalcHold(-1)" onmouseup="stopCalcHold()" onmouseleave="stopCalcHold()" ontouchstart="startCalcHold(-1)" ontouchend="stopCalcHold()">−</button>
-                        
-                        <div class="calc-horizontal-viewport" id="calc-touch-area">
-                            <div class="calc-horizontal-track" id="calc-horizontal-track">
-                                <span class="calc-num side" id="num-prev">6</span>
-                                <span class="calc-num active" id="num-center">7</span>
-                                <span class="calc-num side" id="num-next">8</span>
+                        <button class="calc-step-btn" onclick="changeCalcVal('limit', -1)">−</button>
+                        <div class="calc-horizontal-viewport" id="touch-area-limit">
+                            <div class="calc-horizontal-track">
+                                <span class="calc-num side" id="limit-prev">12</span>
+                                <span class="calc-num active" id="limit-center">13</span>
+                                <span class="calc-num side" id="limit-next">14</span>
                             </div>
                         </div>
-
-                        <button class="calc-step-btn" id="btn-calc-plus" onmousedown="startCalcHold(1)" onmouseup="stopCalcHold()" onmouseleave="stopCalcHold()" ontouchstart="startCalcHold(1)" ontouchend="stopCalcHold()">+</button>
+                        <button class="calc-step-btn" onclick="changeCalcVal('limit', 1)">+</button>
                     </div>
                 </div>
 
                 <button class="admin-action-submit" onclick="createAdminPromo()">СОХРАНИТЬ ПРОМОКОД</button>
             </div>
 
-            <!-- СЕКЦИЯ: ОДОБРЕННЫЕ ПОЛЬЗОВАТЕЛИ -->
+            <!-- 2. ОДОБРЕННЫЕ ПОЛЬЗОВАТЕЛИ -->
             <div class="admin-card">
                 <div class="admin-card-title">⭐️ ОДОБРЕННЫЕ ПОЛЬЗОВАТЕЛИ</div>
                 <div class="promo-input-row" style="margin-bottom: 10px;">
@@ -300,9 +334,14 @@
                 </div>
             </div>
 
-            <!-- СЕКЦИЯ: ВСЕ ПОЛЬЗОВАТЕЛИ -->
+            <!-- 3. ВСЕ ПОЛЬЗОВАТЕЛИ -->
             <div class="admin-card">
                 <div class="admin-card-title">👥 ВСЕ ПОЛЬЗОВАТЕЛИ</div>
+                
+                <div class="promo-input-row" style="margin-bottom: 10px;">
+                    <input type="text" id="admin-search-user" placeholder="🔍 Поиск..." oninput="filterAllUsersList()">
+                </div>
+
                 <div class="all-users-scroll-list" id="all-users-container"></div>
             </div>
         </div>
