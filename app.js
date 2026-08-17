@@ -18,9 +18,12 @@ let isRefOpen = false;
 let activeLaserAnim = null;
 let allCitiesList = [];
 
-// Стейт рефералки и игр
+// Стейт рефералки и игр (ВСЕ ТЕСТОВЫЕ БАЛАНСЫ ОБНУЛЕНЫ)
 let currentRefPercent = 5.0;
 const maxRefPercent = 40.0;
+let refBalance = 0; 
+const maxRefBalance = 1000;
+
 let isGameRunning = false;
 let isSubscribedUser = false; 
 let isScanAvailable = true;   
@@ -36,6 +39,8 @@ let calcValues = { days: 7, discount: 30, limit: 13 };
 let touchStartXs = { days: 0, discount: 0, limit: 0 };
 
 let createdPromos = {}; 
+
+// 🎯 АБСОЛЮТНО ЧИСТЫЕ МАССИВЫ (БЕЗ ФЕЙКОВЫХ ЮЗЕРОВ)
 let approvedUsers = [];
 let allUsersList = [];
 
@@ -159,7 +164,7 @@ function initMap3D() {
 }
 
 // ==========================================
-// 💧 3. КАПЛИ ВШИВЬ И ВВЕРХ
+// 💧 3. КАПЛИ
 // ==========================================
 function triggerLiquidSplash() {
     const dropsBox = document.getElementById("liquid-drops-box");
@@ -274,10 +279,8 @@ function connectVPN() {
             isConnected = true;
             statusText.innerText = "ПОДКЛЮЧЕНО";
             statusBadge.className = "status-badge connected";
-            connectBtn.classList.add("connected");
-
-            if (telemetryBar) {
-                document.getElementById("ping-val").innerText = Math.floor(18 + Math.random() * 12);
+            connectBtn.classList.add("connected");if (telemetryBar) {
+                document.getElementById("ping-val").innerText = Math.floor(18 + Math.random() * 6);
                 telemetryBar.classList.remove("hidden");
             }
 
@@ -295,6 +298,7 @@ function disconnectVPN() {
     statusText.innerText = "ОТКЛЮЧЕНО";
     statusBadge.className = "status-badge disconnected";
     connectBtn.classList.remove("connected");
+    
     if (telemetryBar) telemetryBar.classList.add("hidden");
 
     copyKeyBtn.classList.add("hidden-slide");
@@ -331,7 +335,6 @@ function flashCity(cityId) {
     }
 }
 
-// 🔑 КОПИРОВАНИЕ КЛЮЧА
 function copyVlessKey() {
     const dummyKey = "vless://sol-vpn-node-amsterdam-secure-key-9981273";
     navigator.clipboard.writeText(dummyKey);
@@ -389,9 +392,7 @@ function applyPromoCode() {
     const card = document.getElementById("promo-card-element");
     const statusMsg = document.getElementById("promo-status-msg");
     const btn = document.getElementById("promo-apply-btn");
-    const headerText = document.getElementById("promo-header-text");
-    
-    if (!inputField) return;
+    const headerText = document.getElementById("promo-header-text");if (!inputField) return;
     const val = inputField.value.trim().toUpperCase();
 
     if (!val) {
@@ -480,11 +481,21 @@ function toggleRefCard(forceState = null) {
     if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
 }
 
+function useRefBalanceForTariff() {
+    if (refBalance <= 0) {
+        alert("🚨 На вашем реферальном балансе 0 ₽. Приглашайте друзей, чтобы копить средства!");
+        if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("error");
+        return;
+    }
+    toggleRefCard(false);
+    toggleTariffs(true);
+}
+
 function copyRefLinkDirect() {
     const field = document.getElementById("ref-link-field");
-    if (!field) return;
+    if (!field || !field.value) return;
     navigator.clipboard.writeText(field.value);
-    alert("🚀 Реферальная ссылка скопирована в буфер обмена!");
+    alert("🚀 Реферальная ссылка скопирована!");
     if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
 }
 
@@ -505,7 +516,7 @@ function startCatchGame() {
 
     if (!isScanAvailable && !isAdmin) {
         if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("error");
-        alert("🚨 Лимит сканирования исчерпан! Сканер перезаряжается. Возвращайтесь завтра!");
+        alert("🚨 Лимит сканирования исчерпан! Возвращайтесь завтра.");
         return;
     }
 
@@ -620,7 +631,8 @@ function spawnComet(index, speed) {
 
         if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("heavy");
         
-        const slot = document.getElementById(`loot-slot-${caughtCount}`);if (slot) {
+        const slot = document.getElementById(`loot-slot-${caughtCount}`);
+        if (slot) {
             caughtCount++;
             
             const cometRect = comet.getBoundingClientRect();
@@ -772,7 +784,6 @@ function spinSpaceSlot(discountValue) {
         slotContainer.style.boxShadow = `0 0 35px ${neons[targetSegment]}, inset 0 0 15px ${neons[targetSegment]}`;
 
         activeDiscounts[targetSegment] = discountValue;
-        
         updateTariffPricesUI();
 
         if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
@@ -787,8 +798,27 @@ function spinSpaceSlot(discountValue) {
 function updateRefUI() {
     const label = document.getElementById("ref-percent-val");
     const gameLabel = document.getElementById("game-ref-percent");
+    const balanceLabel = document.getElementById("ref-balance-val");
+    const payBtn = document.getElementById("ref-pay-btn");
+    const linkField = document.getElementById("ref-link-field");
+
     if (label) label.innerText = `${currentRefPercent.toFixed(1)}%`;
     if (gameLabel) gameLabel.innerText = `${currentRefPercent.toFixed(1)}% / 40%`;
+    if (balanceLabel) balanceLabel.innerText = `${refBalance} / ${maxRefBalance} ₽`;
+
+    if (userData && userData.id) {
+        if (linkField) linkField.value = `https://t.me/sol_vpn_bot?start=ref${userData.id}`;
+    } else {
+        if (linkField) linkField.value = `https://t.me/sol_vpn_bot?start=ref_guest`;
+    }
+
+    if (payBtn) {
+        if (refBalance <= 0) {
+            payBtn.classList.add("disabled-btn");
+        } else {
+            payBtn.classList.remove("disabled-btn");
+        }
+    }
 }
 
 function createFloatingText(x, y, text, cssClass) {
@@ -842,7 +872,7 @@ function updateTariffPricesUI() {
             
             if (tagEl) {
                 tagEl.innerText = `🔥 -${activeDiscounts[t]}%`;
-                tagEl.style.color =neons[t];
+                tagEl.style.color = neons[t];
                 tagEl.style.textShadow = `0 0 8px ${neons[t]}`;
                 tagEl.className = "tariff-discount-tag show-tag";
             }
@@ -933,8 +963,7 @@ function setAdminLimitType(type) {
         if (btnCount) btnCount.className = "admin-type-btn sub-mode active-green";
         if (limitTitle) limitTitle.innerText = "ВЫБЕРИТЕ КОЛИЧЕСТВО АКТИВАЦИЙ";
     }
-    updateCalcDisplays();
-    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
+    updateCalcDisplays();if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
 }
 
 function updateCalcDisplays() {
@@ -1027,7 +1056,6 @@ function createAdminPromo() {
     if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
 }
 
-// ❌ ОДОБРЕННЫЕ ПОЛЬЗОВАТЕЛИ
 function renderApprovedUsersDrum() {
     const drum = document.getElementById("approved-users-drum");
     if (!drum) return;
@@ -1068,7 +1096,6 @@ function removeApprovedUser(index) {
     if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("medium");
 }
 
-// 👥 ВСЕ ПОЛЬЗОВАТЕЛИ
 function filterAllUsersList() {
     const searchInput = document.getElementById("admin-search-user");
     const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
@@ -1130,16 +1157,19 @@ function giftPromoToUser(username, e) {
 }
 
 // ==========================================
-// 💡 8. БАЗА ЗНАНИЙ
+// 💡 БАЗА ЗНАНИЙ
 // ==========================================
 const defaultInfoText = "Нажмите на любой вопрос ниже. Ваш ответ появится здесь. Если нужной темы нет — напишите в нашу техподдержку.";
 
 const faqAnswers = {
     1: "Для подключения перейдите на вкладку Тоннель и нажмите фиолетовую кнопку по центру. Дождитесь появления лазерного луча и статуса ПОДКЛЮЧЕНО.",
     2: "После подключения нажмите выехавшую кнопку Скопировать ключ VLESS. Вставьте его в ваше приложение-клиент V2Ray, Happ или Hiddify.",
+    3: "⚡️ Скорость не ограничена с нашей стороны и достигает до 1 Гбит/с. Задержка минимальная благодаря прямому туннелю.",
+    4: "📱 Один ключ рассчитан на 1 активное устройство для предотвращения перегрузки серверов.",
     5: "📈 Чтобы увеличить процент реферальной программы перейдите во вкладку 'Игры', запускайте сканирование радара и ловите скоростные кометы! Каждая пойманная комета дает до +3.0% к вашей ставке.",
     6: "🚫 Доступ к Охоте на кометы заблокирован, если у вас нет активной подписки VPN. Приобретите любой тариф на вкладке Кабинет, чтобы разблокировать доступ к играм.",
-    7: "☄️ Кометы пролетают через зону действия космического радара на разных скоростях. Успейте кликнуть (или тапнуть) по комете, чтобы она треснула, раскололась и принесла вам бонус!"
+    7: "☄️ Кометы пролетают через зону действия космического радара на разных скоростях. Успейте кликнуть (или тапнуть) по комете, чтобы она треснула, раскололась и принесла вам бонус!",
+    8: "🌐 Да, VLESS работает на смартфонах, ПК (Windows/macOS/Linux) и даже роутерах Keenetic!"
 };
 
 function animateDipText(newText) {
@@ -1183,18 +1213,23 @@ function answerFAQ(id) {
 }
 
 // ==========================================
-// 📂 9. ТАРИФЫ
+// 📂 ТАРИФЫ (ЧЕТКИЙ ИСПРАВЛЕННЫЙ КЛИК)
 // ==========================================
-function toggleTariffs() {
+function toggleTariffs(forceOpen = false) {
     const flowContainer = document.getElementById("tariffs-flow");
     const cards = document.querySelectorAll(".tariff-card");
     if (!flowContainer || cards.length === 0) return;
 
-    isTariffsOpen = !isTariffsOpen;
+    if (forceOpen) {
+        isTariffsOpen = true;
+    } else {
+        isTariffsOpen = !isTariffsOpen;
+    }
 
     if (isTariffsOpen) {
         if (isPromoOpen) togglePromoCard(false);
         if (isRefOpen) toggleRefCard(false);
+        
         flowContainer.classList.remove("hidden-flow");
         cards.forEach((card, index) => {
             setTimeout(() => { if (card) card.classList.add("show-card"); }, index * 90);
@@ -1212,7 +1247,7 @@ function toggleTariffs() {
 function selectTariff(months) {
     let displayValue = (months === 12) ? "∞ Безлимит" : `${months * 30} дней`;
 
-    alert(`Вы успешно приобрели тариф на ${months} мес. (Тестовая покупка)!`);
+    alert(`Вы выбрали тариф на ${months} мес.!`);
     isSubscribedUser = true;
     
     const leftVal = document.getElementById("sub-days-left");
@@ -1225,7 +1260,7 @@ function selectTariff(months) {
 }
 
 // ==========================================
-// 🧭 10. НАВИГАЦИЯ
+// 🧭 НАВИГАЦИЯ
 // ==========================================
 function switchNav(index, screenId) {
     document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
@@ -1238,11 +1273,6 @@ function switchNav(index, screenId) {
     if (activeNavBtn) activeNavBtn.classList.add("active");
 
     alignNavBox(index);
-
-    if (screenId === 'profile') {
-        if (isPromoOpen) togglePromoCard(true);
-        if (isRefOpen) toggleRefCard(true);
-    }
 
     if (screenId === 'games') {
         checkGameLockStatus();
@@ -1263,8 +1293,7 @@ function alignNavBox(index) {
 }
 
 function generateLongSmartPath() {
-    let selectedNodes = [];
-    let attempts = 0;
+    let selectedNodes = [];let attempts = 0;
 
     while (selectedNodes.length < 5 && attempts < 200) {
         attempts++;
@@ -1283,19 +1312,21 @@ function generateLongSmartPath() {
     }
 
     if (selectedNodes.length < 5) {
-        const shuffled = [...allCitiesList].sort(() => 0.5 - Math.random());selectedNodes = shuffled.slice(0, 5);
+        const shuffled = [...allCitiesList].sort(() => 0.5 - Math.random());
+        selectedNodes = shuffled.slice(0, 5);
     }
 
     return selectedNodes;
 }
 
 // ==========================================
-// 🏁 11. ТОЧКА ВХОДА
+// 🏁 ТОЧКА ВХОДА
 // ==========================================
 window.onload = () => {
     initSpaceFX();
     initMap3D();
     fillReelCards();
+    updateRefUI();
     initAdminPanel();
 
     if (isAdmin) {

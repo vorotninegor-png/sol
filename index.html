@@ -12,10 +12,9 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     
-    <link rel="stylesheet" href="style.css?v=1001">
+    <link rel="stylesheet" href="style.css?v=3000">
 
     <style>
-        /* 🎯 ЖЕСТКИЙ НЕВИДИМЫЙ ХИТБОКС С ТОЧНОЙ ПРИВЯЗКОЙ */
         .hitbox-overlay {
             position: absolute !important;
             top: 0 !important;
@@ -57,13 +56,14 @@
 
         <div class="status-capsule">
             <span class="status-label">СТАТУС ПОДКЛЮЧЕНИЯ</span>
+            
             <div class="status-badge disconnected" id="status-badge">
                 <span class="status-dot"></span>
                 <span id="status-text">ОТКЛЮЧЕНО</span>
             </div>
             
-            <div class="telemetry-barhidden" id="telemetry-bar">
-                <span>ПИНГ: <b id="ping-val">24</b> ms</span>
+            <div class="telemetry-bar hidden" id="telemetry-bar">
+                <span>ПИНГ: <b id="ping-val">0</b> ms</span>
                 <span class="divider">|</span>
                 <span>ПРОТОКОЛ: <b>VLESS</b></span>
             </div>
@@ -139,7 +139,7 @@
             </div>
         </div>
 
-        <!-- ОКНО РЕФЕРАЛКИ С БАЛАНСОМ -->
+        <!-- ОКНО РЕФЕРАЛКИ -->
         <div class="promo-drawer-container hidden-drawer" id="ref-drawer">
             <div class="ref-card-box">
                 <div class="promo-header">
@@ -156,17 +156,17 @@
                     </div>
                     <div class="ref-stat-item info-align-right">
                         <span class="ref-label">НАКОПЛЕНО БАЛАНСА:</span>
-                        <span class="ref-val max-color" id="ref-balance-val">0 / 1000 ₽</span></div>
+                        <span class="ref-val max-color" id="ref-balance-val">0 / 1000 ₽</span>
+                    </div>
                 </div>
                 <p class="ref-hint-text">Накопленные средства до 1000 ₽ можно использовать для оплаты любых тарифов SOL VPN!</p>
-                <div class="promo-input-row" style="margin-bottom: 8px;">
-                    <input type="text" id="ref-link-field" value="https://t.me/sol_vpn_bot?start=ref12345" readonly>
+                <div class="promo-input-row" style="margin-bottom: 12px;">
+                    <input type="text" id="ref-link-field" value="" placeholder="Загрузка ссылки..." readonly>
                     <button class="apply-promo-btn" onclick="copyRefLinkDirect()">
                         📋
                         <div class="hitbox-overlay"></div>
                     </button>
-                </div>
-                <button class="apply-promo-btn success-btn" style="width: 100%; padding: 10px;" onclick="useRefBalanceForTariff()">
+                </div><button class="apply-promo-btn success-btn ref-pay-btn" id="ref-pay-btn" onclick="useRefBalanceForTariff()">
                     💳 ОПЛАТИТЬ ТАРИФ С БАЛАНСА
                     <div class="hitbox-overlay"></div>
                 </button>
@@ -270,7 +270,7 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 4: ИНФО (ПЛАВНО РАСТЯГИВАЮЩЕЕСЯ ОКНО) -->
+    <!-- ЭКРАН 4: ИНФО -->
     <div class="screen" id="screen-info">
         <div class="faq-header">
             <h2>💡 БАЗА ЗНАНИЙ</h2>
@@ -350,8 +350,7 @@
                 <div class="calc-widget-container disabled-block" id="block-days">
                     <span class="calc-label">КОЛИЧЕСТВО ДНЕЙ ПОДПИСКИ</span>
                     <div class="calc-control-bar">
-                        <button class="calc-step-btn" onclick="changeCalcVal('days', -1)">
-                            −
+                        <button class="calc-step-btn" onclick="changeCalcVal('days', -1)">−
                             <div class="hitbox-overlay"></div>
                         </button>
                         <div class="calc-horizontal-viewport" id="touch-area-days">
@@ -424,8 +423,7 @@
                     <div class="calc-control-bar">
                         <button class="calc-step-btn" onclick="changeCalcVal('limit', -1)">
                             −
-                            <div class="hitbox-overlay"></div>
-                        </button>
+                            <div class="hitbox-overlay"></div></button>
                         <div class="calc-horizontal-viewport" id="touch-area-limit">
                             <div class="calc-horizontal-track">
                                 <span class="calc-num side" id="limit-prev">12</span>
@@ -497,10 +495,11 @@
         <button class="nav-item admin-only-item hidden" id="btn-nav-4" onclick="switchNav(4, 'admin')">
             <span class="nav-icon">👑</span>
             <span class="nav-text">Админ</span>
-            <div class="hitbox-overlay"></div></button>
+            <div class="hitbox-overlay"></div>
+        </button>
     </nav>
 </div>
 
-<script src="app.js?v=1001"></script>
+<script src="app.js?v=3000"></script>
 </body>
 </html>
