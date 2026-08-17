@@ -12,28 +12,24 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     
-    <!-- 🚀 Версия v=999 принудительно заставляет Telegram перекачать обновленный CSS -->
-    <link rel="stylesheet" href="style.css?v=999">
+    <link rel="stylesheet" href="style.css?v=1001">
 
     <style>
-        /* 🎯 БРОНИРОВАННАЯ СИСТЕМА НЕВИДИМЫХ ХИТБОКСОВ (ПОВЕРХ ВСЕХ КНОПОК) */
+        /* 🎯 ЖЕСТКИЙ НЕВИДИМЫЙ ХИТБОКС С ТОЧНОЙ ПРИВЯЗКОЙ */
         .hitbox-overlay {
             position: absolute !important;
             top: 0 !important;
             left: 0 !important;
-            right: 0 !important;
-            bottom: 0 !important;
             width: 100% !important;
             height: 100% !important;
-            z-index: 9999 !important; /* Находится выше всех визуальных слоев */
-            background: rgba(0, 0, 0, 0) !important; /* Абсолютно невидимый */
+            z-index: 99999 !important;
+            background: rgba(0, 0, 0, 0) !important;
             cursor: pointer !important;
-            border-radius: inherit !important; /* Повторяет скругления кнопки */
+            border-radius: inherit !important;
             touch-action: manipulation !important;
             -webkit-tap-highlight-color: transparent !important;
         }
 
-        /* Фиксируем относительное позиционирование для всех кликабельных карт */
         .power-button, .action-btn, .action-card, .apply-promo-btn, 
         .liquid-reveal-btn, .tariff-card, .faq-btn, .nav-item, 
         .admin-type-btn, .calc-step-btn, .t-sketch-btn, .admin-action-submit {
@@ -66,7 +62,7 @@
                 <span id="status-text">ОТКЛЮЧЕНО</span>
             </div>
             
-            <div class="telemetry-bar hidden" id="telemetry-bar">
+            <div class="telemetry-barhidden" id="telemetry-bar">
                 <span>ПИНГ: <b id="ping-val">24</b> ms</span>
                 <span class="divider">|</span>
                 <span>ПРОТОКОЛ: <b>VLESS</b></span>
@@ -76,7 +72,6 @@
         <div class="connect-button-wrapper">
             <div class="liquid-button-container">
                 <div class="micro-waves-box" id="micro-waves-box"></div>
-                <!-- 🎯 КНОПКА ПОДКЛЮЧЕНИЯ С НЕВИДИМЫМ ХИТБОКСОМ -->
                 <button class="power-button liquid-water-drop" id="connect-btn">
                     <div class="hitbox-overlay"></div>
                 </button>
@@ -85,7 +80,6 @@
         </div>
 
         <div class="key-btn-container">
-            <!-- 🎯 КНОПКА СКОПИРОВАТЬ КЛЮЧ -->
             <button class="action-btn key-glow-btn hidden-slide" id="copy-key-btn" onclick="copyVlessKey()">
                 🔑 СКОПИРОВАТЬ КЛЮЧ VLESS
                 <div class="hitbox-overlay"></div>
@@ -110,13 +104,11 @@
         </div>
 
         <div class="quick-actions-grid">
-            <!-- 🎯 КАРТОЧКА ПРОМОКОД -->
             <div class="action-card" id="promo-trigger-card" onclick="togglePromoCard()">
                 <span class="act-icon">🎁</span>
                 <span class="act-title">Промокод</span>
                 <div class="hitbox-overlay"></div>
             </div>
-            <!-- 🎯 КАРТОЧКА РЕФЕРАЛКА -->
             <div class="action-card" id="ref-trigger-card" onclick="toggleRefCard()">
                 <span class="act-icon">👥</span>
                 <span class="act-title">Рефералка</span>
@@ -147,7 +139,7 @@
             </div>
         </div>
 
-        <!-- ОКНО РЕФЕРАЛКИ -->
+        <!-- ОКНО РЕФЕРАЛКИ С БАЛАНСОМ -->
         <div class="promo-drawer-container hidden-drawer" id="ref-drawer">
             <div class="ref-card-box">
                 <div class="promo-header">
@@ -163,22 +155,25 @@
                         <span class="ref-val" id="ref-percent-val">5.0%</span>
                     </div>
                     <div class="ref-stat-item info-align-right">
-                        <span class="ref-label">МАКС. СТАВКА:</span>
-                        <span class="ref-val max-color">40.0%</span>
-                    </div>
+                        <span class="ref-label">НАКОПЛЕНО БАЛАНСА:</span>
+                        <span class="ref-val max-color" id="ref-balance-val">0 / 1000 ₽</span></div>
                 </div>
-                <p class="ref-hint-text">Поднимайте свой процент в разделе "Игры", чтобы получать больше от покупок друзей!</p>
-                <div class="promo-input-row">
+                <p class="ref-hint-text">Накопленные средства до 1000 ₽ можно использовать для оплаты любых тарифов SOL VPN!</p>
+                <div class="promo-input-row" style="margin-bottom: 8px;">
                     <input type="text" id="ref-link-field" value="https://t.me/sol_vpn_bot?start=ref12345" readonly>
                     <button class="apply-promo-btn" onclick="copyRefLinkDirect()">
                         📋
                         <div class="hitbox-overlay"></div>
                     </button>
                 </div>
+                <button class="apply-promo-btn success-btn" style="width: 100%; padding: 10px;" onclick="useRefBalanceForTariff()">
+                    💳 ОПЛАТИТЬ ТАРИФ С БАЛАНСА
+                    <div class="hitbox-overlay"></div>
+                </button>
             </div>
         </div>
 
-        <!-- 🎯 РАЗДЕЛ ТАРИФОВ -->
+        <!-- РАЗДЕЛ ТАРИФОВ -->
         <div class="tariffs-section">
             <button class="liquid-reveal-btn" id="tariffs-toggle-btn" onclick="toggleTariffs()">
                 ПОСМОТРЕТЬ ТАРИФЫ
@@ -252,11 +247,11 @@
         </div>
 
         <div class="game-radar-box" id="radar-stage">
-            <div class="radar-circle-glow"><div class="radar-line-scanner"></div>
+            <div class="radar-circle-glow">
+                <div class="radar-line-scanner"></div>
             </div>
         </div>
 
-        <!-- 🎯 КНОПКА СКАНИРОВАНИЯ -->
         <button class="liquid-reveal-btn radar-ready" id="start-radar-btn" onclick="startCatchGame()">
             ЗАПУСТИТЬ СКАНИРОВАНИЕ
             <div class="hitbox-overlay"></div>
@@ -275,13 +270,13 @@
         </div>
     </div>
 
-    <!-- ЭКРАН 4: ИНФО -->
+    <!-- ЭКРАН 4: ИНФО (ПЛАВНО РАСТЯГИВАЮЩЕЕСЯ ОКНО) -->
     <div class="screen" id="screen-info">
         <div class="faq-header">
             <h2>💡 БАЗА ЗНАНИЙ</h2>
         </div>
 
-        <div class="terminal-box">
+        <div class="terminal-box" id="terminal-box-element">
             <div class="terminal-header">
                 <span class="term-dot red"></span>
                 <span class="term-dot yellow"></span>
@@ -291,7 +286,6 @@
             <div class="terminal-body" id="terminal-text"></div>
         </div>
 
-        <!-- 🎯 КНОПКИ БАЗЫ ЗНАНИЙ -->
         <div class="faq-questions-scroll">
             <button class="faq-btn" onclick="answerFAQ(1)">
                 🚀 Как подключить VPN?
@@ -299,6 +293,14 @@
             </button>
             <button class="faq-btn" onclick="answerFAQ(2)">
                 🔑 Где взять VLESS ключ?
+                <div class="hitbox-overlay"></div>
+            </button>
+            <button class="faq-btn" onclick="answerFAQ(3)">
+                ⚡️ Какая максимальная скорость?
+                <div class="hitbox-overlay"></div>
+            </button>
+            <button class="faq-btn" onclick="answerFAQ(4)">
+                📱 Сколько устройств можно подключить?
                 <div class="hitbox-overlay"></div>
             </button>
             <button class="faq-btn" onclick="answerFAQ(5)">
@@ -313,6 +315,10 @@
                 ☄️ Как ловить кометы?
                 <div class="hitbox-overlay"></div>
             </button>
+            <button class="faq-btn" onclick="answerFAQ(8)">
+                🌐 Работает ли на ПК и роутерах?
+                <div class="hitbox-overlay"></div>
+            </button>
         </div>
     </div>
 
@@ -323,7 +329,6 @@
         </div>
 
         <div class="admin-scroll-content">
-            <!-- 1. СОЗДАНИЕ ПРОМОКОДОВ -->
             <div class="admin-card">
                 <div class="admin-card-title">🎁 СОЗДАТЬ ПРОМОКОД</div>
                 
@@ -342,7 +347,6 @@
                     </button>
                 </div>
 
-                <!-- Калькулятор Дней -->
                 <div class="calc-widget-container disabled-block" id="block-days">
                     <span class="calc-label">КОЛИЧЕСТВО ДНЕЙ ПОДПИСКИ</span>
                     <div class="calc-control-bar">
@@ -364,7 +368,6 @@
                     </div>
                 </div>
 
-                <!-- Калькулятор Скидки -->
                 <div class="calc-widget-container disabled-block" id="block-discount">
                     <span class="calc-label">ПРОЦЕНТ СКИДКИ (%)</span>
                     <div class="calc-control-bar">
@@ -386,7 +389,6 @@
                     </div>
                 </div>
 
-                <!-- Выбор тарифов для скидки -->
                 <div class="admin-tariffs-row-sketch disabled-block" id="block-tariffs">
                     <button class="t-sketch-btn" id="p-tariff-1m" onclick="toggleAdminTariffPick(1)">
                         1 МЕС
@@ -417,7 +419,6 @@
                     </button>
                 </div>
 
-                <!-- Калькулятор Лимитов -->
                 <div class="calc-widget-container active-green-block" id="block-limit">
                     <span class="calc-label" id="limit-calc-title">ВЫБЕРИТЕ СРОК ЖИЗНИ (ДНИ)</span>
                     <div class="calc-control-bar">
@@ -425,7 +426,8 @@
                             −
                             <div class="hitbox-overlay"></div>
                         </button>
-                        <div class="calc-horizontal-viewport" id="touch-area-limit"><div class="calc-horizontal-track">
+                        <div class="calc-horizontal-viewport" id="touch-area-limit">
+                            <div class="calc-horizontal-track">
                                 <span class="calc-num side" id="limit-prev">12</span>
                                 <span class="calc-num active" id="limit-center">13</span>
                                 <span class="calc-num side" id="limit-next">14</span>
@@ -444,7 +446,6 @@
                 </button>
             </div>
 
-            <!-- 2. ОДОБРЕННЫЕ ПОЛЬЗОВАТЕЛИ -->
             <div class="admin-card">
                 <div class="admin-card-title">⭐️ ОДОБРЕННЫЕ ПОЛЬЗОВАТЕЛИ</div>
                 <div class="promo-input-row" style="margin-bottom: 10px;">
@@ -460,20 +461,17 @@
                 </div>
             </div>
 
-            <!-- 3. ВСЕ ПОЛЬЗОВАТЕЛИ -->
             <div class="admin-card">
                 <div class="admin-card-title">👥 ВСЕ ПОЛЬЗОВАТЕЛИ</div>
-                
                 <div class="promo-input-row" style="margin-bottom: 10px;">
                     <input type="text" id="admin-search-user" placeholder="🔍 Поиск..." oninput="filterAllUsersList()">
                 </div>
-
                 <div class="all-users-scroll-list" id="all-users-container"></div>
             </div>
         </div>
     </div>
 
-    <!-- 🎯 НИЖНЯЯ НАВИГАЦИЯ -->
+    <!-- НАВИГАЦИЯ -->
     <nav class="bottom-nav" id="app-bottom-nav">
         <div class="nav-liquid-box" id="nav-liquid-box"></div>
         <button class="nav-item active" id="btn-nav-0" onclick="switchNav(0, 'tunnel')">
@@ -499,12 +497,10 @@
         <button class="nav-item admin-only-item hidden" id="btn-nav-4" onclick="switchNav(4, 'admin')">
             <span class="nav-icon">👑</span>
             <span class="nav-text">Админ</span>
-            <div class="hitbox-overlay"></div>
-        </button>
+            <div class="hitbox-overlay"></div></button>
     </nav>
 </div>
 
-<!-- 🚀 Версия v=999 для гарантии обхода кэша Telegram -->
-<script src="app.js?v=999"></script>
+<script src="app.js?v=1001"></script>
 </body>
 </html>
