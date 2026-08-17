@@ -12,7 +12,34 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     
-    <link rel="stylesheet" href="style.css">
+    <!-- 🚀 Версия v=999 принудительно заставляет Telegram перекачать обновленный CSS -->
+    <link rel="stylesheet" href="style.css?v=999">
+
+    <style>
+        /* 🎯 БРОНИРОВАННАЯ СИСТЕМА НЕВИДИМЫХ ХИТБОКСОВ (ПОВЕРХ ВСЕХ КНОПОК) */
+        .hitbox-overlay {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 9999 !important; /* Находится выше всех визуальных слоев */
+            background: rgba(0, 0, 0, 0) !important; /* Абсолютно невидимый */
+            cursor: pointer !important;
+            border-radius: inherit !important; /* Повторяет скругления кнопки */
+            touch-action: manipulation !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+
+        /* Фиксируем относительное позиционирование для всех кликабельных карт */
+        .power-button, .action-btn, .action-card, .apply-promo-btn, 
+        .liquid-reveal-btn, .tariff-card, .faq-btn, .nav-item, 
+        .admin-type-btn, .calc-step-btn, .t-sketch-btn, .admin-action-submit {
+            position: relative !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -49,14 +76,20 @@
         <div class="connect-button-wrapper">
             <div class="liquid-button-container">
                 <div class="micro-waves-box" id="micro-waves-box"></div>
-                <button class="power-button liquid-water-drop" id="connect-btn"></button>
+                <!-- 🎯 КНОПКА ПОДКЛЮЧЕНИЯ С НЕВИДИМЫМ ХИТБОКСОМ -->
+                <button class="power-button liquid-water-drop" id="connect-btn">
+                    <div class="hitbox-overlay"></div>
+                </button>
                 <div id="liquid-drops-box"></div>
             </div>
         </div>
 
         <div class="key-btn-container">
+            <!-- 🎯 КНОПКА СКОПИРОВАТЬ КЛЮЧ -->
             <button class="action-btn key-glow-btn hidden-slide" id="copy-key-btn" onclick="copyVlessKey()">
-                🔑 СКОПИРОВАТЬ КЛЮЧ VLESS</button>
+                🔑 СКОПИРОВАТЬ КЛЮЧ VLESS
+                <div class="hitbox-overlay"></div>
+            </button>
         </div>
     </div>
 
@@ -77,16 +110,21 @@
         </div>
 
         <div class="quick-actions-grid">
+            <!-- 🎯 КАРТОЧКА ПРОМОКОД -->
             <div class="action-card" id="promo-trigger-card" onclick="togglePromoCard()">
                 <span class="act-icon">🎁</span>
                 <span class="act-title">Промокод</span>
+                <div class="hitbox-overlay"></div>
             </div>
+            <!-- 🎯 КАРТОЧКА РЕФЕРАЛКА -->
             <div class="action-card" id="ref-trigger-card" onclick="toggleRefCard()">
                 <span class="act-icon">👥</span>
                 <span class="act-title">Рефералка</span>
+                <div class="hitbox-overlay"></div>
             </div>
         </div>
 
+        <!-- ОКНО ПРОМОКОДА -->
         <div class="promo-drawer-container hidden-drawer" id="promo-drawer">
             <div class="promo-card-box" id="promo-card-element">
                 <div class="promo-header">
@@ -94,20 +132,30 @@
                         <span id="promo-header-text">🎁 ВВЕДИТЕ ПРОМОКОД</span>
                         <span class="promo-status-msg" id="promo-status-msg"></span>
                     </div>
-                    <button class="close-promo-btn" onclick="togglePromoCard()">✕</button>
+                    <button class="close-promo-btn" onclick="togglePromoCard()">
+                        ✕
+                        <div class="hitbox-overlay"></div>
+                    </button>
                 </div>
                 <div class="promo-input-row">
                     <input type="text" id="promo-input-field" placeholder="Например: SOL2026">
-                    <button class="apply-promo-btn" id="promo-apply-btn" onclick="applyPromoCode()">ОК</button>
+                    <button class="apply-promo-btn" id="promo-apply-btn" onclick="applyPromoCode()">
+                        ОК
+                        <div class="hitbox-overlay"></div>
+                    </button>
                 </div>
             </div>
         </div>
 
+        <!-- ОКНО РЕФЕРАЛКИ -->
         <div class="promo-drawer-container hidden-drawer" id="ref-drawer">
             <div class="ref-card-box">
                 <div class="promo-header">
                     <span>👥 РЕФЕРАЛЬНАЯ СИСТЕМА</span>
-                    <button class="close-promo-btn" onclick="toggleRefCard()">✕</button>
+                    <button class="close-promo-btn" onclick="toggleRefCard()">
+                        ✕
+                        <div class="hitbox-overlay"></div>
+                    </button>
                 </div>
                 <div class="ref-stats-row">
                     <div class="ref-stat-item">
@@ -122,13 +170,20 @@
                 <p class="ref-hint-text">Поднимайте свой процент в разделе "Игры", чтобы получать больше от покупок друзей!</p>
                 <div class="promo-input-row">
                     <input type="text" id="ref-link-field" value="https://t.me/sol_vpn_bot?start=ref12345" readonly>
-                    <button class="apply-promo-btn" onclick="copyRefLinkDirect()">📋</button>
+                    <button class="apply-promo-btn" onclick="copyRefLinkDirect()">
+                        📋
+                        <div class="hitbox-overlay"></div>
+                    </button>
                 </div>
             </div>
         </div>
 
+        <!-- 🎯 РАЗДЕЛ ТАРИФОВ -->
         <div class="tariffs-section">
-            <button class="liquid-reveal-btn" id="tariffs-toggle-btn" onclick="toggleTariffs()">ПОСМОТРЕТЬ ТАРИФЫ</button>
+            <button class="liquid-reveal-btn" id="tariffs-toggle-btn" onclick="toggleTariffs()">
+                ПОСМОТРЕТЬ ТАРИФЫ
+                <div class="hitbox-overlay"></div>
+            </button>
             <div class="tariffs-flow-container hidden-flow" id="tariffs-flow">
                 <div class="tariffs-grid">
                     <div class="tariff-card" id="tariff-1m" onclick="selectTariff(1)">
@@ -138,6 +193,7 @@
                         </div>
                         <div class="tariff-price" id="price-1m">150 ₽</div>
                         <div class="tariff-discount-tag" id="discount-tag-1m"></div>
+                        <div class="hitbox-overlay"></div>
                     </div>
                     
                     <div class="tariff-card recommended" id="tariff-3m" onclick="selectTariff(3)">
@@ -148,6 +204,7 @@
                         </div>
                         <div class="tariff-price" id="price-3m">400 ₽</div>
                         <div class="tariff-discount-tag" id="discount-tag-3m"></div>
+                        <div class="hitbox-overlay"></div>
                     </div>
 
                     <div class="tariff-card" id="tariff-6m" onclick="selectTariff(6)">
@@ -158,6 +215,7 @@
                         </div>
                         <div class="tariff-price" id="price-6m">650 ₽</div>
                         <div class="tariff-discount-tag" id="discount-tag-6m"></div>
+                        <div class="hitbox-overlay"></div>
                     </div>
 
                     <div class="tariff-card vip" id="tariff-12m" onclick="selectTariff(12)">
@@ -168,6 +226,7 @@
                         </div>
                         <div class="tariff-price" id="price-12m">990 ₽</div>
                         <div class="tariff-discount-tag" id="discount-tag-12m"></div>
+                        <div class="hitbox-overlay"></div>
                     </div>
                 </div>
             </div>
@@ -193,13 +252,14 @@
         </div>
 
         <div class="game-radar-box" id="radar-stage">
-            <div class="radar-circle-glow">
-                <div class="radar-line-scanner"></div>
+            <div class="radar-circle-glow"><div class="radar-line-scanner"></div>
             </div>
         </div>
 
+        <!-- 🎯 КНОПКА СКАНИРОВАНИЯ -->
         <button class="liquid-reveal-btn radar-ready" id="start-radar-btn" onclick="startCatchGame()">
             ЗАПУСТИТЬ СКАНИРОВАНИЕ
+            <div class="hitbox-overlay"></div>
         </button>
 
         <div class="space-slot-container" id="wheel-container">
@@ -231,12 +291,28 @@
             <div class="terminal-body" id="terminal-text"></div>
         </div>
 
+        <!-- 🎯 КНОПКИ БАЗЫ ЗНАНИЙ -->
         <div class="faq-questions-scroll">
-            <button class="faq-btn" onclick="answerFAQ(1)">🚀 Как подключить VPN?</button>
-            <button class="faq-btn" onclick="answerFAQ(2)">🔑 Где взять VLESS ключ?</button>
-            <button class="faq-btn" onclick="answerFAQ(5)">📈 Как поднять % рефералки?</button>
-            <button class="faq-btn" onclick="answerFAQ(6)">🔒 Почему заблокированы игры?</button>
-            <button class="faq-btn" onclick="answerFAQ(7)">☄️ Как ловить кометы?</button>
+            <button class="faq-btn" onclick="answerFAQ(1)">
+                🚀 Как подключить VPN?
+                <div class="hitbox-overlay"></div>
+            </button>
+            <button class="faq-btn" onclick="answerFAQ(2)">
+                🔑 Где взять VLESS ключ?
+                <div class="hitbox-overlay"></div>
+            </button>
+            <button class="faq-btn" onclick="answerFAQ(5)">
+                📈 Как поднять % рефералки?
+                <div class="hitbox-overlay"></div>
+            </button>
+            <button class="faq-btn" onclick="answerFAQ(6)">
+                🔒 Почему заблокированы игры?
+                <div class="hitbox-overlay"></div>
+            </button>
+            <button class="faq-btn" onclick="answerFAQ(7)">
+                ☄️ Как ловить кометы?
+                <div class="hitbox-overlay"></div>
+            </button>
         </div>
     </div>
 
@@ -256,15 +332,24 @@
                 </div>
 
                 <div class="admin-toggle-row">
-                    <button class="admin-type-btn" id="btn-mode-days" onclick="toggleAdminPromoType('days')">🎁 ДНИ</button>
-                    <button class="admin-type-btn" id="btn-mode-discount" onclick="toggleAdminPromoType('discount')">🔥 СКИДКА</button>
+                    <button class="admin-type-btn" id="btn-mode-days" onclick="toggleAdminPromoType('days')">
+                        🎁 ДНИ
+                        <div class="hitbox-overlay"></div>
+                    </button>
+                    <button class="admin-type-btn" id="btn-mode-discount" onclick="toggleAdminPromoType('discount')">
+                        🔥 СКИДКА
+                        <div class="hitbox-overlay"></div>
+                    </button>
                 </div>
 
                 <!-- Калькулятор Дней -->
                 <div class="calc-widget-container disabled-block" id="block-days">
                     <span class="calc-label">КОЛИЧЕСТВО ДНЕЙ ПОДПИСКИ</span>
                     <div class="calc-control-bar">
-                        <button class="calc-step-btn" onclick="changeCalcVal('days', -1)">−</button>
+                        <button class="calc-step-btn" onclick="changeCalcVal('days', -1)">
+                            −
+                            <div class="hitbox-overlay"></div>
+                        </button>
                         <div class="calc-horizontal-viewport" id="touch-area-days">
                             <div class="calc-horizontal-track">
                                 <span class="calc-num side" id="days-prev">6</span>
@@ -272,7 +357,10 @@
                                 <span class="calc-num side" id="days-next">8</span>
                             </div>
                         </div>
-                        <button class="calc-step-btn" onclick="changeCalcVal('days', 1)">+</button>
+                        <button class="calc-step-btn" onclick="changeCalcVal('days', 1)">
+                            +
+                            <div class="hitbox-overlay"></div>
+                        </button>
                     </div>
                 </div>
 
@@ -280,7 +368,10 @@
                 <div class="calc-widget-container disabled-block" id="block-discount">
                     <span class="calc-label">ПРОЦЕНТ СКИДКИ (%)</span>
                     <div class="calc-control-bar">
-                        <button class="calc-step-btn" onclick="changeCalcVal('discount', -1)">−</button>
+                        <button class="calc-step-btn" onclick="changeCalcVal('discount', -1)">
+                            −
+                            <div class="hitbox-overlay"></div>
+                        </button>
                         <div class="calc-horizontal-viewport" id="touch-area-discount">
                             <div class="calc-horizontal-track">
                                 <span class="calc-num side" id="discount-prev">29</span>
@@ -288,39 +379,69 @@
                                 <span class="calc-num side" id="discount-next">31</span>
                             </div>
                         </div>
-                        <button class="calc-step-btn" onclick="changeCalcVal('discount', 1)">+</button>
+                        <button class="calc-step-btn" onclick="changeCalcVal('discount', 1)">
+                            +
+                            <div class="hitbox-overlay"></div>
+                        </button>
                     </div>
                 </div>
 
                 <!-- Выбор тарифов для скидки -->
                 <div class="admin-tariffs-row-sketch disabled-block" id="block-tariffs">
-                    <button class="t-sketch-btn" id="p-tariff-1m" onclick="toggleAdminTariffPick(1)">1 МЕС</button>
-                    <button class="t-sketch-btn" id="p-tariff-3m" onclick="toggleAdminTariffPick(3)">3 МЕС</button>
-                    <button class="t-sketch-btn" id="p-tariff-6m" onclick="toggleAdminTariffPick(6)">6 МЕС</button>
-                    <button class="t-sketch-btn" id="p-tariff-12m" onclick="toggleAdminTariffPick(12)">12 МЕС</button>
+                    <button class="t-sketch-btn" id="p-tariff-1m" onclick="toggleAdminTariffPick(1)">
+                        1 МЕС
+                        <div class="hitbox-overlay"></div>
+                    </button>
+                    <button class="t-sketch-btn" id="p-tariff-3m" onclick="toggleAdminTariffPick(3)">
+                        3 МЕС
+                        <div class="hitbox-overlay"></div>
+                    </button>
+                    <button class="t-sketch-btn" id="p-tariff-6m" onclick="toggleAdminTariffPick(6)">
+                        6 МЕС
+                        <div class="hitbox-overlay"></div>
+                    </button>
+                    <button class="t-sketch-btn" id="p-tariff-12m" onclick="toggleAdminTariffPick(12)">
+                        12 МЕС
+                        <div class="hitbox-overlay"></div>
+                    </button>
                 </div>
 
                 <div class="admin-toggle-row" style="margin-top: 12px;">
-                    <button class="admin-type-btn sub-mode active-green" id="btn-limit-days" onclick="setAdminLimitType('lifetime_days')">⏳ ДНИ ЖИЗНИ</button>
-                    <button class="admin-type-btn sub-mode" id="btn-limit-count" onclick="setAdminLimitType('activations')">👥 АКТИВАЦИИ</button>
+                    <button class="admin-type-btn sub-mode active-green" id="btn-limit-days" onclick="setAdminLimitType('lifetime_days')">
+                        ⏳ ДНИ ЖИЗНИ
+                        <div class="hitbox-overlay"></div>
+                    </button>
+                    <button class="admin-type-btn sub-mode" id="btn-limit-count" onclick="setAdminLimitType('activations')">
+                        👥 АКТИВАЦИИ
+                        <div class="hitbox-overlay"></div>
+                    </button>
                 </div>
 
                 <!-- Калькулятор Лимитов -->
                 <div class="calc-widget-container active-green-block" id="block-limit">
                     <span class="calc-label" id="limit-calc-title">ВЫБЕРИТЕ СРОК ЖИЗНИ (ДНИ)</span>
                     <div class="calc-control-bar">
-                        <button class="calc-step-btn" onclick="changeCalcVal('limit', -1)">−</button>
-                        <div class="calc-horizontal-viewport" id="touch-area-limit">
-                            <div class="calc-horizontal-track">
+                        <button class="calc-step-btn" onclick="changeCalcVal('limit', -1)">
+                            −
+                            <div class="hitbox-overlay"></div>
+                        </button>
+                        <div class="calc-horizontal-viewport" id="touch-area-limit"><div class="calc-horizontal-track">
                                 <span class="calc-num side" id="limit-prev">12</span>
                                 <span class="calc-num active" id="limit-center">13</span>
                                 <span class="calc-num side" id="limit-next">14</span>
                             </div>
-                        </div><button class="calc-step-btn" onclick="changeCalcVal('limit', 1)">+</button>
+                        </div>
+                        <button class="calc-step-btn" onclick="changeCalcVal('limit', 1)">
+                            +
+                            <div class="hitbox-overlay"></div>
+                        </button>
                     </div>
                 </div>
 
-                <button class="admin-action-submit" onclick="createAdminPromo()">СОХРАНИТЬ ПРОМОКОД</button>
+                <button class="admin-action-submit" onclick="createAdminPromo()">
+                    СОХРАНИТЬ ПРОМОКОД
+                    <div class="hitbox-overlay"></div>
+                </button>
             </div>
 
             <!-- 2. ОДОБРЕННЫЕ ПОЛЬЗОВАТЕЛИ -->
@@ -328,7 +449,10 @@
                 <div class="admin-card-title">⭐️ ОДОБРЕННЫЕ ПОЛЬЗОВАТЕЛИ</div>
                 <div class="promo-input-row" style="margin-bottom: 10px;">
                     <input type="text" id="admin-approved-input" placeholder="@username">
-                    <button class="apply-promo-btn" onclick="addApprovedUser()">+</button>
+                    <button class="apply-promo-btn" onclick="addApprovedUser()">
+                        +
+                        <div class="hitbox-overlay"></div>
+                    </button>
                 </div>
 
                 <div class="drum-list-viewport">
@@ -349,32 +473,38 @@
         </div>
     </div>
 
-    <!-- НАВИГАЦИЯ -->
+    <!-- 🎯 НИЖНЯЯ НАВИГАЦИЯ -->
     <nav class="bottom-nav" id="app-bottom-nav">
         <div class="nav-liquid-box" id="nav-liquid-box"></div>
         <button class="nav-item active" id="btn-nav-0" onclick="switchNav(0, 'tunnel')">
             <span class="nav-icon">⚡️</span>
             <span class="nav-text">Тоннель</span>
+            <div class="hitbox-overlay"></div>
         </button>
         <button class="nav-item" id="btn-nav-1" onclick="switchNav(1, 'profile')">
             <span class="nav-icon">👤</span>
             <span class="nav-text">Кабинет</span>
+            <div class="hitbox-overlay"></div>
         </button>
         <button class="nav-item" id="btn-nav-2" onclick="switchNav(2, 'games')">
             <span class="nav-icon">🎮</span>
             <span class="nav-text">Игры</span>
+            <div class="hitbox-overlay"></div>
         </button>
         <button class="nav-item" id="btn-nav-3" onclick="switchNav(3, 'info')">
             <span class="nav-icon">💡</span>
             <span class="nav-text">Инфо</span>
+            <div class="hitbox-overlay"></div>
         </button>
         <button class="nav-item admin-only-item hidden" id="btn-nav-4" onclick="switchNav(4, 'admin')">
             <span class="nav-icon">👑</span>
             <span class="nav-text">Админ</span>
+            <div class="hitbox-overlay"></div>
         </button>
     </nav>
 </div>
 
-<script src="app.js"></script>
+<!-- 🚀 Версия v=999 для гарантии обхода кэша Telegram -->
+<script src="app.js?v=999"></script>
 </body>
 </html>
