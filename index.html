@@ -83,7 +83,8 @@
             </div>
             <div class="action-card" id="ref-trigger-card" onclick="toggleRefCard()">
                 <span class="act-icon">👥</span>
-                <span class="act-title">Рефералка</span></div>
+                <span class="act-title">Рефералка</span>
+            </div>
         </div>
 
         <div class="promo-drawer-container hidden-drawer" id="promo-drawer">
@@ -127,7 +128,7 @@
         </div>
 
         <div class="tariffs-section">
-            <button class="liquid-reveal-btn" onclick="toggleTariffs()">ПОСМОТРЕТЬ ТАРИФЫ</button>
+            <button class="liquid-reveal-btn" id="tariffs-toggle-btn" onclick="toggleTariffs()">ПОСМОТРЕТЬ ТАРИФЫ</button>
             <div class="tariffs-flow-container hidden-flow" id="tariffs-flow">
                 <div class="tariffs-grid">
                     <div class="tariff-card" id="tariff-1m" onclick="selectTariff(1)">
@@ -257,7 +258,9 @@
                 <div class="admin-toggle-row">
                     <button class="admin-type-btn" id="btn-mode-days" onclick="toggleAdminPromoType('days')">🎁 ДНИ</button>
                     <button class="admin-type-btn" id="btn-mode-discount" onclick="toggleAdminPromoType('discount')">🔥 СКИДКА</button>
-                </div><!-- Калькулятор Дней -->
+                </div>
+
+                <!-- Калькулятор Дней -->
                 <div class="calc-widget-container disabled-block" id="block-days">
                     <span class="calc-label">КОЛИЧЕСТВО ДНЕЙ ПОДПИСКИ</span>
                     <div class="calc-control-bar">
@@ -313,8 +316,7 @@
                                 <span class="calc-num active" id="limit-center">13</span>
                                 <span class="calc-num side" id="limit-next">14</span>
                             </div>
-                        </div>
-                        <button class="calc-step-btn" onclick="changeCalcVal('limit', 1)">+</button>
+                        </div><button class="calc-step-btn" onclick="changeCalcVal('limit', 1)">+</button>
                     </div>
                 </div>
 
